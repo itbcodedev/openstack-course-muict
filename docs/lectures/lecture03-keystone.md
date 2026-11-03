@@ -1,24 +1,24 @@
-# Lecture 3: Keystone — Identity & Access Management
+# การบรรยายที่ 3: Keystone — ระบบจัดการตัวตนและสิทธิ์
 
-## Learning Objectives
+## วัตถุประสงค์การเรียนรู้
 
-- Understand authentication vs. authorization in OpenStack
-- Manage users, projects, roles, and domains
-- Work with service catalogs and endpoints
-
----
-
-## What is Keystone?
-
-Keystone is the **identity service** in OpenStack. It provides:
-
-- **Authentication** — verifying who you are
-- **Authorization** — determining what you can do
-- **Service Catalog** — listing available services and their endpoints
+- เข้าใจความแตกต่างระหว่าง Authentication และ Authorization ใน OpenStack
+- จัดการ Users, Projects, Roles และ Domains
+- ทำงานกับ Service Catalog และ Endpoints
 
 ---
 
-## Core Concepts
+## Keystone คืออะไร?
+
+Keystone คือ **บริการ Identity** ของ OpenStack ให้บริการ:
+
+- **Authentication** — ยืนยันว่าคุณเป็นใคร
+- **Authorization** — ตรวจสอบว่าคุณทำอะไรได้บ้าง
+- **Service Catalog** — แสดงรายการบริการที่มีพร้อม Endpoints
+
+---
+
+## แนวคิดหลัก
 
 ```
 ┌─────────────────────────────────────────┐
@@ -34,63 +34,63 @@ Keystone is the **identity service** in OpenStack. It provides:
 ```
 
 ### Domain
-- Top-level namespace for users, groups, and projects
-- Enables multi-tenancy at the organizational level
-- Default domain: `default`
+- Namespace ระดับสูงสุดสำหรับ Users, Groups และ Projects
+- รองรับ Multi-tenancy ระดับองค์กร
+- Domain เริ่มต้น: `default`
 
-### Project (formerly Tenant)
-- A container for resources (VMs, networks, volumes)
-- Users are granted access via roles within a project
+### Project (เดิมช Tenant)
+- คอนเทนเนอร์สำหรับทรัพยากร (VMs, Networks, Volumes)
+- ผู้ใช้ได้รับสิทธิ์ผ่าน Roles ภายใน Project
 
 ### User
-- An entity representing a person or service account
-- Authenticated via password, token, or external IdP
+- เอนทิตีที่แทนบุคคลหรือ Service Account
+- ยืนยันตัวตนผ่าน Password, Token หรือ External IdP
 
 ### Role
-- Defines a set of permissions within a project
-- Common roles: `admin`, `member`, `reader`
+- กำหนดชุดสิทธิ์ภายใน Project
+- Roles ทั่วไป: `admin`, `member`, `reader`
 
 ### Group
-- Collection of users
-- Roles can be assigned to groups for easier management
+- ชุดของ Users
+- สามารถกำหนด Roles ให้ Group ได้เพื่อง่ายต่อการจัดการ
 
 ---
 
-## Token-Based Authentication
+## การยืนยันตัวตนด้วย Token
 
 ```
 User credentials → Keystone
     ↓
-Keystone verifies credentials
+Keystone ตรวจสอบ credentials
     ↓
-Returns Token (UUID or JWT)
+คืน Token (UUID หรือ JWT)
     ↓
-User presents Token to other services
+User นำ Token ไปแสดงต่อบริการอื่น ๆ
     ↓
-Services ask Keystone to validate Token
+บริการอื่น ๆ ขอ Keystone ตรวจสอบ Token
 ```
 
-### Token Types
+### รูปแบบ Token
 
-| Type | Description |
+| รูปแบบ | คำอธิบาย |
 |------|-------------|
-| **UUID** | Random string, validated by Keystone on every request |
-| **PKI/PKIz** | Self-validating, cryptographically signed |
-| **Fernet** | Default in modern OpenStack, encrypted payload |
+| **UUID** | String สุ่ม ตรวจสอบโดย Keystone ทุกครั้ง |
+| **PKI/PKIz** | Self-validating ลายเซ็น Cryptographic |
+| **Fernet** | Default ใน OpenStack สมัยใหม่ มี Payload ที่เข้ารหัส |
 
 ---
 
-## Service Catalog & Endpoints
+## Service Catalog และ Endpoints
 
-Keystone maintains a catalog of all OpenStack services:
+Keystone เก็บ Catalog ของทุกบริการ OpenStack:
 
-| Endpoint Type | Purpose |
+| ประเภท Endpoint | หน้าที่ |
 |---------------|---------|
-| **public** | External-facing API |
-| **internal** | Inter-service communication |
-| **admin** | Administrative operations |
+| **public** | API สำหรับภายนอก |
+| **internal** | การสื่อสารระหว่างบริการภายใน |
+| **admin** | การดำเนินการระดับ Admin |
 
-Example:
+ตัวอย่าง:
 ```yaml
 Service: compute (nova)
   public:   https://cloud.muict.ac.th:8774/v2.1
@@ -100,12 +100,12 @@ Service: compute (nova)
 
 ---
 
-## Policy Files
+## ไฟล์ Policy
 
-Each service has a `policy.json` or `policy.yaml` that maps roles to API operations:
+แต่ละบริการมี `policy.json` หรือ `policy.yaml` ที่จัด mapping ระหว่าง Roles กับ API Operations:
 
 ```yaml
-# Example: Only admins can create flavors
+# ตัวอย่าง: เฉพาะ admin สามารถสร้าง flavors ได้
 "os_compute_api:os-flavor-manage:create": "rule:admin_api"
 ```
 
@@ -113,39 +113,39 @@ Each service has a `policy.json` or `policy.yaml` that maps roles to API operati
 
 ## Federated Identity
 
-Keystone supports external identity providers:
+Keystone รองรับ External Identity Providers:
 
 - **LDAP** — Active Directory, OpenLDAP
 - **SAML 2.0** — Shibboleth, ADFS
 - **OpenID Connect** — Google, Keycloak
 
-This enables single sign-on (SSO) for OpenStack.
+ช่วยให้สามารถใช้ Single Sign-On (SSO) กับ OpenStack ได้
 
 ---
 
-## Hands-on Commands
+## คำสั่งใช้งานจริง
 
 ```bash
-# List users
+# แสดงรายการ Users
 openstack user list
 
-# Create a project
-openstack project create --description "Student Project" student-project
+# สร้าง Project
+openstack project create --description "โครงการนักศึกษา" student-project
 
-# Assign role to user in project
+# กำหนด Role ให้ User ใน Project
 openstack role add --user alice --project student-project member
 
-# Get token
+# ขอ Token
 openstack token issue
 ```
 
 ---
 
-## Slides
+## สไลด์การบรรยาย
 
-📥 [Download Lecture 3 Slides (PDF)](../assets/slides/lecture03.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 3 (PDF)](../assets/slides/lecture03.pdf){ .md-button }
 
-## Further Reading
+## แหล่งข้อมูลเพิ่มเติม
 
 - [Keystone Administrator Guide](https://docs.openstack.org/keystone/latest/admin/)
-- [RBAC in OpenStack](https://docs.openstack.org/keystone/latest/admin/auth-tokens.html)
+- [RBAC ใน OpenStack](https://docs.openstack.org/keystone/latest/admin/auth-tokens.html)

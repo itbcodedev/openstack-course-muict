@@ -1,70 +1,80 @@
-# 📋 Course Syllabus
+# 📋 หลักสูตรรายวิชา
 
-## OpenStack Cloud Computing — MUICT
-
----
-
-## Course Description
-
-This course covers the architecture, deployment, and administration of OpenStack cloud infrastructure. Students gain practical skills through hands-on labs using DevStack and production-grade deployments.
-
-## Learning Outcomes
-
-By the end of this course, students will be able to:
-
-1. Explain cloud computing models (IaaS, PaaS, SaaS) and OpenStack's role
-2. Deploy a functional OpenStack environment using DevStack
-3. Configure and manage core OpenStack services (Keystone, Nova, Neutron, Glance, Cinder, Swift)
-4. Design secure multi-tenant network topologies
-5. Automate cloud resource provisioning with Heat templates
-6. Monitor cloud infrastructure performance and troubleshoot issues
-7. Plan and execute a production OpenStack deployment
+## วิชา OpenStack Cloud Computing — MUICT
 
 ---
 
-## Assessment
+## คำอธิบายรายวิชา
 
-| Component | Weight | Description |
-|-----------|--------|-------------|
-| Labs & Assignments | 40% | Weekly hands-on lab reports |
-| Midterm Project | 20% | Deploy a 3-tier application on OpenStack |
-| Final Exam | 20% | Theory + practical troubleshooting |
-| Class Participation | 10% | Quizzes, discussions, peer reviews |
-| Final Project | 10% | Group project: Custom OpenStack deployment |
+รายวิชานี้กล่าวถึงสถาปัตยกรรม การติดตั้ง และการบริหารจัดการโครงสร้างพื้นฐาน Cloud ด้วย OpenStack นักศึกษาจะได้รับทักษะการปฏิบัติจริงผ่านการทดลอง Lab โดยใช้ DevStack และการติดตั้งระดับ Production
+
+## ผลลัพธ์การเรียนรู้
+
+เมื่อจบรายวิชานี้ นักศึกษาจะสามารถ:
+
+1. อธิบายรูปแบบของ Cloud Computing (IaaS, PaaS, SaaS) และบทบาทของ OpenStack
+2. ติดตั้งสภาพแวดล้อม OpenStack ที่ใช้งานได้จริงโดยใช้ DevStack
+3. กำหนดค่าและบริหารจัดการบริการหลักของ OpenStack (Keystone, Nova, Neutron, Glance, Cinder, Swift)
+4. ออกแบบโทโปโลยีเครือข่ายแบบ Multi-tenant ที่ปลอดภัย
+5. Automate การจัดสรรทรัพยากร Cloud ด้วย Heat Templates
+6. ตรวจสอบประสิทธิภาพและแก้ไขปัญหาโครงสร้างพื้นฐาน Cloud
+7. วางแผนและดำเนินการติดตั้ง OpenStack ระดับ Production
 
 ---
 
-## Schedule
+## การประเมินผล
 
-| Week | Topic | Lab |
+| องค์ประกอบ | น้ำหนัก | รายละเอียด |
+|-----------|--------|------------|
+| รายงาน Lab | 40% | รายงานการทดลองปฏิบัติรายสัปดาห์ |
+| โครงงานกลางภาค | 20% | Deploy แอปพลิเคชัน 3-tier บน OpenStack |
+| สอบปลายภาค | 20% | ทฤษฎี + ปฏิบัติการแก้ไขปัญหา |
+| การเข้าร่วมในชั้นเรียน | 10% | แบบทดสอบ การอภิปราย Peer Review |
+| โครงงานปลายภาค | 10% | โครงงานกลุ่ม: ติดตั้ง OpenStack แบบกำหนดเอง |
+
+---
+
+## กำหนดการเรียนการสอน
+
+| สัปดาห์ | หัวข้อ | การทดลอง |
 |------|-------|-----|
-| 1 | Cloud Computing Fundamentals | Environment Setup |
-| 2 | OpenStack Architecture & History | DevStack Installation |
-| 3 | Keystone — Identity & Access | User/Project/Role Management |
-| 4 | Nova — Compute Service | Launch & Manage VMs |
-| 5 | Neutron — Networking | VLAN, Router, Security Groups |
-| 6 | Glance — Image Service | Custom Image Creation |
-| 7 | Cinder — Block Storage | Volume Management |
-| 8 | Swift — Object Storage | Object Store Operations |
-| 9 | Heat — Orchestration | Template-based Deployment |
-| 10 | Ceilometer / Gnocchi — Monitoring | Metrics & Alarms |
-| 11 | Production Deployment (Kolla-Ansible) | Containerized OpenStack |
-| 12 | Troubleshooting & Best Practices | Debug Scenarios |
-| 13 | Student Project Presentations | — |
-| 14 | Final Exam | — |
+| 1 | พื้นฐาน Cloud Computing | ติดตั้ง CentOS Stream 10 บน Hyper-V |
+| 2 | สถาปัตยกรรมและประวัติ OpenStack | ติดตั้ง DevStack |
+| 3 | Keystone — ตัวตนและสิทธิ์ | จัดการ User/Project/Role |
+| 4 | Nova — บริการ Compute | สร้างและจัดการ VM |
+| 5 | Neutron — เครือข่าย | VLAN, Router, Security Groups |
+| 6 | Glance — บริการ Image | สร้าง Image แบบกำหนดเอง |
+| 7 | Cinder — Block Storage | จัดการ Volume |
+| 8 | Swift — Object Storage | การใช้งาน Object Store |
+| 9 | Heat — Orchestration | Deploy ด้วย Template |
+| 10 | Ceilometer / Gnocchi — การตรวจสอบ | Metrics และ Alarms |
+| 11 | การติดตั้งระดับ Production (Kolla-Ansible) | OpenStack แบบ Containerized |
+| 12 | การแก้ไขปัญหาและแนวปฏิบัติที่ดี | Scenarios การ Debug |
+| 13 | นำเสนอโครงงานนักศึกษา | — |
+| 14 | สอบปลายภาค | — |
 
 ---
 
-## Prerequisites
+## เงื่อนไขเบื้องต้น
 
-- Linux command line proficiency
-- Basic networking (TCP/IP, VLANs, routing)
-- Familiarity with Python scripting
-- Virtualization concepts (KVM, QEMU)
+- เชี่ยวชาญการใช้งาน Command Line ของ Linux
+- เครือข่ายเบื้องต้น (TCP/IP, VLANs, Routing)
+- คุ้นเคยกับการเขียน Python Script
+- แนวคิด Virtualization (KVM, QEMU)
 
-## Required Tools
+## เครื่องมือที่ต้องใช้
 
-- A laptop with 16GB+ RAM (for DevStack)
-- Ubuntu 22.04 LTS VM or bare metal
-- SSH client and terminal access
-- GitHub account for code submissions
+- คอมพิวเตอร์แล็ปท็อปพร้อม Hyper-V และ RAM 16 GB+
+- Virtual Machine CentOS Stream 10 (RAM 8 GB, Disk 60 GB)
+- SSH Client และ Terminal Access
+- บัญชี GitHub สำหรับส่งงาน
+
+## สภาพแวดล้อมที่ใช้ในรายวิชา
+
+| สภาพแวดล้อม | ผลิตภัณฑ์ |
+|-----------|---------|
+| Host OS | Windows 10/11 Pro พร้อม Hyper-V |
+| Guest OS | CentOS Stream 10 |
+| Cloud Platform | OpenStack (DevStack) |
+| Virtualization | KVM (Nested ใน Hyper-V) |
+| Networking | Neutron with Open vSwitch |

@@ -1,61 +1,61 @@
-# Lab 3: OpenStack CLI Operations
+# การทดลองที่ 3: การใช้งาน OpenStack CLI
 
-## Objective
+## วัตถุประสงค์
 
-Master the OpenStack command-line client for managing cloud resources programmatically.
+เชี่ยวชาญการใช้ OpenStack Command-line Client สำหรับจัดการทรัพยากร Cloud แบบ Programmatic
 
 ---
 
-## Prerequisites
+## เงื่อนไขก่อนเรียน
 
 ```bash
-# Source your DevStack credentials
-source ~/devstack/openrc admin
+# โหลด credentials ของ DevStack
+source /opt/stack/devstack/openrc admin
 
-# Verify CLI is working
+# ตรวจสอบว่า CLI ทำงานได้
 openstack --version
 ```
 
 ---
 
-## Part 1: CLI Basics
+## ส่วนที่ 1: พื้นฐาน CLI
 
-### Command Structure
+### โครงสร้างคำสั่ง
 
 ```bash
 openstack <service> <action> <resource> [options]
 ```
 
-Examples:
+ตัวอย่าง:
 ```bash
-openstack server list              # List VMs
-openstack network list             # List networks
-openstack flavor list              # List flavors
-openstack image list               # List images
+openstack server list              # แสดงรายการ VMs
+openstack network list             # แสดงรายการ Networks
+openstack flavor list              # แสดงรายการ Flavors
+openstack image list               # แสดงรายการ Images
 ```
 
-### Get Help
+### ขอความช่วยเหลือ
 
 ```bash
-openstack --help                   # Top-level help
-openstack server --help            # Server subcommand help
-openstack server create --help     # Specific command help
+openstack --help                   # ความช่วยเหลือระดับบน
+openstack server --help            # ความช่วยเหลือ Subcommand
+openstack server create --help     # ความช่วยเหลือเฉพาะคำสั่ง
 ```
 
 ---
 
-## Part 2: Identity & Project Management
+## ส่วนที่ 2: จัดการตัวตนและโครงการ
 
-### Create a Project
+### สร้าง Project
 
 ```bash
 openstack project create \
-  --description "MUICT OpenStack Course" \
+  --description "วิชา OpenStack MUICT" \
   --enable \
   muict-course
 ```
 
-### Create a User
+### สร้าง User
 
 ```bash
 openstack user create \
@@ -66,7 +66,7 @@ openstack user create \
   student01
 ```
 
-### Assign a Role
+### กำหนด Role
 
 ```bash
 openstack role add \
@@ -74,11 +74,11 @@ openstack role add \
   --project muict-course \
   member
 
-# Verify
+# ตรวจสอบ
 openstack role assignment list --user student01 --project muict-course
 ```
 
-### Create a Service Account
+### สร้าง Service Account
 
 ```bash
 openstack user create \
@@ -90,15 +90,15 @@ openstack user create \
 
 ---
 
-## Part 3: Compute Operations
+## ส่วนที่ 3: การดำเนินการกับ Compute
 
 ### Flavors
 
 ```bash
-# List all flavors
+# แสดงรายการ Flavors
 openstack flavor list
 
-# Create a custom flavor
+# สร้าง Flavor แบบกำหนดเอง
 openstack flavor create \
   --ram 2048 \
   --disk 20 \
@@ -110,24 +110,24 @@ openstack flavor create \
 ### Key Pairs
 
 ```bash
-# Generate SSH key
+# สร้าง SSH key
 ssh-keygen -t rsa -f ~/.ssh/openstack_key -N ""
 
-# Upload to OpenStack
+# อัปโหลดขึ้น OpenStack
 openstack keypair create --public-key ~/.ssh/openstack_key.pub openstack_key
 
-# List keypairs
+# แสดงรายการ Keypairs
 openstack keypair list
 ```
 
-### Launch an Instance
+### สร้าง Instance
 
 ```bash
-# Find available images and networks
+# ตรวจสอบ Images และ Networks ที่มี
 openstack image list
 openstack network list
 
-# Launch
+# สร้าง VM
 openstack server create \
   --image cirros-0.6.2-x86_64-disk \
   --flavor m1.tiny \
@@ -137,18 +137,18 @@ openstack server create \
   --wait \
   my-cli-vm
 
-# Check status
+# ตรวจสอบสถานะ
 openstack server show my-cli-vm
 openstack server list
 ```
 
-### Instance Lifecycle
+### วงจรชีวิตของ Instance
 
 ```bash
-# Stop the instance
+# หยุด Instance
 openstack server stop my-cli-vm
 
-# Start the instance
+# เปิด Instance
 openstack server start my-cli-vm
 
 # Reboot (soft)
@@ -161,28 +161,28 @@ openstack server reboot --hard my-cli-vm
 openstack server suspend my-cli-vm
 openstack server resume my-cli-vm
 
-# Delete
+# ลบ
 openstack server delete my-cli-vm
 ```
 
 ### Console Access
 
 ```bash
-# Get VNC console URL
+# ขอ URL ของ VNC Console
 openstack console url show --vnc my-cli-vm
 ```
 
 ---
 
-## Part 4: Network Operations
+## ส่วนที่ 4: การดำเนินการกับเครือข่าย
 
-### Create Network and Subnet
+### สร้าง Network และ Subnet
 
 ```bash
-# Create network
+# สร้าง Network
 openstack network create student-cli-net
 
-# Create subnet
+# สร้าง Subnet
 openstack subnet create \
   --network student-cli-net \
   --subnet-range 10.100.0.0/24 \
@@ -192,85 +192,85 @@ openstack subnet create \
   student-cli-subnet
 ```
 
-### Create Router
+### สร้าง Router
 
 ```bash
-# Create router
+# สร้าง Router
 openstack router create student-cli-router
 
-# Connect to external network
+# เชื่อมต่อกับ External Network
 openstack router set --external-gateway public student-cli-router
 
-# Connect to internal subnet
+# เชื่อมต่อกับ Internal Subnet
 openstack router add subnet student-cli-router student-cli-subnet
 
-# Verify
+# ตรวจสอบ
 openstack router show student-cli-router
 ```
 
 ### Security Groups
 
 ```bash
-# Create a new security group
+# สร้าง Security Group ใหม่
 openstack security group create ssh-access
 
-# Add SSH rule
+# เพิ่มกฎ SSH
 openstack security group rule create \
   --protocol tcp \
   --dst-port 22 \
   --remote-ip 0.0.0.0/0 \
   ssh-access
 
-# Add ICMP (ping)
+# เพิ่ม ICMP (ping)
 openstack security group rule create \
   --protocol icmp \
   --remote-ip 0.0.0.0/0 \
   ssh-access
 
-# Apply to instance
+# ผูกกับ Instance
 openstack server add security group my-cli-vm ssh-access
 ```
 
 ### Floating IPs
 
 ```bash
-# Allocate floating IP
+# จัดสรร Floating IP
 openstack floating ip create public
 
-# Get the allocated IP
+# ดึง IP ที่จัดสรร
 FLOATING_IP=$(openstack floating ip list -f value -c 'Floating IP Address' | head -1)
 echo $FLOATING_IP
 
-# Associate with instance
+# ผูกกับ Instance
 openstack server add floating ip my-cli-vm $FLOATING_IP
 
-# Verify
+# ตรวจสอบ
 openstack server show my-cli-vm -c addresses
 ```
 
 ---
 
-## Part 5: Volume Operations
+## ส่วนที่ 5: การดำเนินการกับ Volume
 
 ```bash
-# Create volume
+# สร้าง Volume
 openstack volume create --size 5 --description "Data disk" data-volume
 
-# Attach to instance
+# Attach กับ Instance
 openstack server volume attach my-cli-vm data-volume
 
 # Detach
 openstack server volume detach my-cli-vm data-volume
 
-# Delete
+# ลบ
 openstack volume delete data-volume
 ```
 
 ---
 
-## Part 6: Scripting with CLI
+## ส่วนที่ 6: Scripting ด้วย CLI
 
-### Batch VM Creation
+### สร้าง VMs เป็นชุด
 
 ```bash
 #!/bin/bash
@@ -288,7 +288,7 @@ for i in {1..3}; do
     batch-vm-$i
 done
 
-# Wait for all to be active
+# รอให้ทุกตัว Active
 for i in {1..3}; do
   openstack server wait batch-vm-$i
 done
@@ -298,12 +298,12 @@ openstack server list
 
 ---
 
-## Submission
+## การบ้าน
 
-📋 **Lab Report Requirements:**
+📋 **รายงานการทดลอง:**
 
-1. Output of `openstack server list` after creating instances
-2. Screenshot or output showing the floating IP association
-3. Script output from the batch VM creation
-4. Answer: What is the difference between `openstack server stop` and `openstack server suspend`?
-5. Answer: Why is it useful to use `--wait` in automation scripts?
+1. Output ของ `openstack server list` หลังจากสร้าง Instances
+2. Screenshot หรือ Output แสดง Floating IP ที่ผูกไว้
+3. Output จาก Script สร้าง VMs แบบ Batch
+4. ตอบคำถาม: `openstack server stop` ต่างจาก `openstack server suspend` อย่างไร?
+5. ตอบคำถาม: ทำไมถึงมีประโยชน์ที่จะใช้ `--wait` ใน Script อัตโนมัติ?

@@ -1,118 +1,118 @@
-# Lecture 2: OpenStack Architecture & Components
+# การบรรยายที่ 2: สถาปัตยกรรมและส่วนประกอบของ OpenStack
 
-## Learning Objectives
+## วัตถุประสงค์การเรียนรู้
 
-- Understand the logical architecture of OpenStack
-- Identify the role of each core component
-- Learn about internal communication: APIs, message queues, and databases
+- เข้าใจสถาปัตยกรรมเชิงตรรกะ (Logical Architecture) ของ OpenStack
+- ระบุบทบาทของแต่ละส่วนประกอบหลัก
+- เรียนรู้เกี่ยวกับการสื่อสารภายใน: APIs, Message Queue และ Database
 
 ---
 
-## Logical Architecture
+## สถาปัตยกรรมเชิงตรรกะ
 
-OpenStack follows a microservices architecture where each service:
+OpenStack ใช้สถาปัตยกรรมแบบ Microservices โดยแต่ละบริการ:
 
-- Runs independently
-- Communicates via REST APIs
-- Can scale horizontally
+- ทำงานอิสระจากกัน
+- สื่อสารผ่าน REST APIs
+- สามารถ Scale แบบ Horizontal ได้
 
 ### Control Node vs. Compute Node
 
 | Control Node | Compute Node |
 |--------------|--------------|
-| Runs API services, scheduler, database, message queue | Runs the hypervisor (VMs) |
+| ทำงาน API services, scheduler, database, message queue | ทำงาน Hypervisor (VMs) |
 | Keystone, Glance, Neutron Server, Nova API/Scheduler | Nova Compute, Neutron Agent |
-| Usually 2+ for HA | Scales out based on workload |
+| ปกติใช้ 2+ เครื่องสำหรับ HA | Scale out ตาม Workload |
 
 ---
 
-## Internal Communication Flow
+## กระบวนการสื่อสารภายใน
 
-### Example: Launching a VM
+### ตัวอย่าง: การสร้าง VM
 
 ```
 User → Horizon / CLI
   ↓
-Nova API → Keystone (authenticate token)
+Nova API → Keystone (verify token)
   ↓
-Nova Scheduler (picks compute host)
+Nova Scheduler (เลือก compute host)
   ↓
-Message Queue → Nova Compute on selected host
+Message Queue → Nova Compute บน host ที่เลือก
   ↓
-Glance (fetch image) + Neutron (allocate network)
+Glance (ดึง image) + Neutron (จัดสรร network)
   ↓
-Libvirt/KVM creates VM on hypervisor
+Libvirt/KVM สร้าง VM บน hypervisor
 ```
 
 ---
 
-## Key Technologies
+## เทคโนโลยีสำคัญ
 
 ### Message Queue: RabbitMQ / AMQP
 
-- Services communicate asynchronously via a message broker
-- Ensures loose coupling between components
-- Default: RabbitMQ, also supports Qpid and ZeroMQ
+- บริการต่าง ๆ สื่อสารแบบ Asynchronous ผ่าน Message Broker
+- ลดการผูกพัน (Coupling) ระหว่างส่วนประกอบ
+- ค่าเริ่มต้น: RabbitMQ รองรับ Qpid และ ZeroMQ
 
 ### Database: MariaDB / MySQL
 
-- Stores persistent state for all services
-- Each service has its own database schema
-- Galera Cluster for HA deployments
+- เก็บสถานะถาวรของทุกบริการ
+- แต่ละบริการมี Database Schema เป็นของตัวเอง
+- ใช้ Galera Cluster สำหรับระบบ HA
 
 ### WSGI Server
 
-- Python web services use WSGI (e.g., Apache mod_wsgi, uWSGI)
-- Handles HTTP requests and routes to service code
+- Web Services ของ Python ใช้ WSGI (เช่น Apache mod_wsgi, uWSGI)
+- รับ HTTP Requests และส่งต่อไปยัง Service Code
 
 ---
 
-## Service Components Breakdown
+## ส่วนประกอบของแต่ละบริการ
 
 ### Nova (Compute)
 
-| Component | Role |
+| ส่วนประกอบ | หน้าที่ |
 |-----------|------|
-| nova-api | Receives and routes API requests |
-| nova-scheduler | Decides which host runs a VM |
-| nova-compute | Manages VMs on a hypervisor |
-| nova-conductor | Database access mediator |
-| nova-console | VNC/SPICE console proxy |
+| nova-api | รับและส่งต่อ API requests |
+| nova-scheduler | ตัดสินใจเลือก host ที่จะรัน VM |
+| nova-compute | จัดการ VMs บน hypervisor |
+| nova-conductor | ตัวกลางเข้าถึง Database |
+| nova-console | VNC/SPICE Console Proxy |
 
 ### Neutron (Networking)
 
-| Component | Role |
+| ส่วนประกอบ | หน้าที่ |
 |-----------|------|
-| neutron-server | API and plugin manager |
-| L2 Agent (OVS/Linux Bridge) | Manages virtual switches |
-| L3 Agent | Handles routing & NAT |
-| DHCP Agent | Provides IP addresses |
-| Metadata Agent | Supplies cloud-init data |
+| neutron-server | API และ Plugin Manager |
+| L2 Agent (OVS/Linux Bridge) | จัดการ Virtual Switches |
+| L3 Agent | จัดการ Routing และ NAT |
+| DHCP Agent | จ่าย IP Addresses |
+| Metadata Agent | จัดหา Cloud-init Data |
 
 ---
 
-## Deployment Topologies
+## รูปแบบการติดตั้ง (Deployment Topologies)
 
 ### All-in-One (DevStack)
-- Single node — everything on one machine
-- Good for learning and development
+- Node เดียว — ทุกอย่างอยู่บนเครื่องเดียว
+- เหมาะสำหรับการเรียนรู้และพัฒนา
 
 ### Two-Node
 - Control node + Compute node
-- Minimal production-like setup
+- ขั้นต่ำที่คล้าย Production
 
 ### Multi-Node HA
-- Multiple controllers with keepalived/haproxy
-- Many compute nodes
-- Separate storage and network nodes
+- Controller หลายตัวพร้อม keepalived/haproxy
+- Compute nodes หลายตัว
+- Storage และ Network nodes แยก
 
 ---
 
-## Slides
+## สไลด์การบรรยาย
 
-📥 [Download Lecture 2 Slides (PDF)](../assets/slides/lecture02.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 2 (PDF)](../assets/slides/lecture02.pdf){ .md-button }
 
-## Further Reading
+## แหล่งข้อมูลเพิ่มเติม
 
 - [OpenStack Architecture Guide](https://docs.openstack.org/arch-design/)
 - [RabbitMQ Tutorials](https://www.rabbitmq.com/getstarted.html)

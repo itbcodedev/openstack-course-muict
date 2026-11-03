@@ -1,21 +1,21 @@
-# Lab 2: Horizon Dashboard & Project Management
+# การทดลองที่ 2: Horizon Dashboard และการจัดการ Project
 
-## Objective
+## วัตถุประสงค์
 
-Navigate the Horizon web interface and perform basic cloud operations through the GUI.
+สำรวจอินเทอร์เฟซเว็บ Horizon และดำเนินการพื้นฐานของ Cloud ผ่าน GUI
 
 ---
 
-## Part 1: Horizon Overview
+## ส่วนที่ 1: ภาพรวม Horizon
 
-### Login
+### เข้าสู่ระบบ
 
-1. Open browser: `http://<YOUR_DEVSTACK_IP>/dashboard`
+1. เปิดเบราว์เซอร์: `http://10.20.30.11/dashboard`
 2. Domain: `default`
 3. Username: `admin`
-4. Password: your `ADMIN_PASSWORD`
+4. Password: `Muict@2024` (หรือ ADMIN_PASSWORD ที่ตั้งไว้)
 
-### Dashboard Layout
+### โครงสร้าง Dashboard
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -35,94 +35,94 @@ Navigate the Horizon web interface and perform basic cloud operations through th
 
 ---
 
-## Part 2: Create a Project and User
+## ส่วนที่ 2: สร้าง Project และ User
 
-### Via Horizon
+### ผ่าน Horizon
 
-1. Navigate to **Identity → Projects → Create Project**
-2. Fill in:
+1. ไปที่ **Identity → Projects → Create Project**
+2. กรอกข้อมูล:
    - Project Name: `student-lab`
-   - Description: `Lab project for OpenStack course`
-3. Click **Create Project**
+   - Description: `โครงการ Lab รายวิชา OpenStack`
+3. คลิก **Create Project**
 
-### Create a User
+### สร้าง User
 
-1. Navigate to **Identity → Users → Create User**
-2. Fill in:
+1. ไปที่ **Identity → Users → Create User**
+2. กรอกข้อมูล:
    - User Name: `student01`
    - Password: `password123`
    - Primary Project: `student-lab`
    - Role: `member`
-3. Click **Create User**
+3. คลิก **Create User**
 
 ---
 
-## Part 3: Launch an Instance via Horizon
+## ส่วนที่ 3: สร้าง Instance ผ่าน Horizon
 
-### Step 1: Upload an Image
+### ขั้นตอนที่ 1: อัปโหลด Image
 
-1. Go to **Project → Compute → Images → Create Image**
-2. Choose image source: URL
+1. ไปที่ **Project → Compute → Images → Create Image**
+2. เลือก Image Source: URL
 3. Image Location: `https://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img`
 4. Image Format: QCOW2 — QEMU Emulator
-5. Click **Create Image**
+5. คลิก **Create Image**
 
-### Step 2: Create a Network
+### ขั้นตอนที่ 2: สร้าง Network
 
-1. Go to **Project → Network → Networks → Create Network**
+1. ไปที่ **Project → Network → Networks → Create Network**
 2. Network Name: `student-net`
 3. Subnet Name: `student-subnet`
 4. Network Address: `192.168.100.0/24`
 5. Gateway IP: `192.168.100.1`
-6. Click **Create**
+6. คลิก **Create**
 
-### Step 3: Create a Router
+### ขั้นตอนที่ 3: สร้าง Router
 
 1. **Project → Network → Routers → Create Router**
 2. Router Name: `student-router`
 3. External Network: `public`
-4. Click **Create Router**
-5. Click router name → **Interfaces → Add Interface**
+4. คลิก **Create Router**
+5. คลิกชื่อ router → **Interfaces → Add Interface**
 6. Subnet: `student-subnet`
-7. Click **Submit**
+7. คลิก **Submit**
 
-### Step 4: Configure Security Group
+### ขั้นตอนที่ 4: กำหนดค่า Security Group
 
 1. **Project → Network → Security Groups**
-2. Click **Manage Rules** on `default`
+2. คลิก **Manage Rules** ที่ `default`
 3. **Add Rule**:
    - Rule: SSH
    - Remote: CIDR
    - CIDR: `0.0.0.0/0`
-4. Add another:
-   - Rule: ICMP (for ping)
+4. เพิ่มอีกอัน:
+   - Rule: ICMP (สำหรับ ping)
 
-### Step 5: Launch Instance
+### ขั้นตอนที่ 5: สร้าง Instance
 
 1. **Project → Compute → Instances → Launch Instance**
 2. Details:
    - Instance Name: `vm-01`
 3. Source:
    - Select Boot Source: Image
-   - Select the cirros image
+   - เลือก Image cirros
 4. Flavor: `m1.tiny`
 5. Networks: `student-net`
 6. Security Groups: `default`
-7. Key Pair: Create or import one
-8. Click **Launch Instance**
+7. Key Pair: สร้างหรือนำเข้า
+8. คลิก **Launch Instance**
 
 ---
 
-## Part 4: Allocate and Associate a Floating IP
+## ส่วนที่ 4: จัดสรรและผูก Floating IP
 
 1. **Project → Network → Floating IPs → Allocate IP**
 2. Pool: `public`
-3. Click **Allocate IP**
-4. Click **Associate** → Select `vm-01`
-5. Click **Associate**
+3. คลิก **Allocate IP**
+4. คลิก **Associate** → เลือก `vm-01`
+5. คลิก **Associate**
 
-!!! success "Test Connectivity"
-    From your host machine:
+!!! success "ทดสอบการเชื่อมต่อ"
+    จากเครื่อง Host (Windows):
     ```bash
     ping <FLOATING_IP>
     ssh cirros@<FLOATING_IP>
@@ -131,14 +131,14 @@ Navigate the Horizon web interface and perform basic cloud operations through th
 
 ---
 
-## Part 5: Create a Volume and Attach
+## ส่วนที่ 5: สร้าง Volume และ Attach
 
 1. **Project → Volumes → Volumes → Create Volume**
    - Volume Name: `data-vol`
    - Size: 2 GB
-2. Click **Create Volume**
-3. Click **Manage Attachments** → Attach to `vm-01`
-4. SSH into the VM and verify:
+2. คลิก **Create Volume**
+3. คลิก **Manage Attachments** → Attach กับ `vm-01`
+4. SSH เข้า VM และตรวจสอบ:
    ```bash
    ssh cirros@<FLOATING_IP>
    lsblk
@@ -150,13 +150,13 @@ Navigate the Horizon web interface and perform basic cloud operations through th
 
 ---
 
-## Submission
+## การบ้าน
 
-📋 **Lab Report Requirements:**
+📋 **รายงานการทดลอง:**
 
-1. Screenshot of the Project Overview page
-2. Screenshot showing the created `student-net` network topology
-3. Screenshot of `vm-01` running with a floating IP
-4. Screenshot of the SSH session inside the VM
-5. Answer: What is the difference between a private network and a public (external) network?
-6. Answer: Why do we need a router between them?
+1. Screenshot หน้า Project Overview
+2. Screenshot แสดง `student-net` network topology
+3. Screenshot `vm-01` กำลังทำงานพร้อม Floating IP
+4. Screenshot SSH session ภายใน VM
+5. ตอบคำถาม: Private network ต่างจาก Public (external) network อย่างไร?
+6. ตอบคำถาม: ทำไมต้องมี router เชื่อมระหว่างทั้งสอง?

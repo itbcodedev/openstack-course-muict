@@ -1,73 +1,73 @@
-# Lecture 1: Introduction to Cloud Computing & OpenStack
+# การบรรยายที่ 1: บทนำสู่ Cloud Computing และ OpenStack
 
-## Learning Objectives
+## วัตถุประสงค์การเรียนรู้
 
-- Understand cloud computing service and deployment models
-- Know the history and ecosystem of OpenStack
-- Identify the core OpenStack services and their roles
+- เข้าใจรูปแบบบริการและรูปแบบการติดตั้งของ Cloud Computing
+- รู้จักประวัติและระบบนิเวศของ OpenStack
+- ระบุบริการหลักของ OpenStack และบทบาทของแต่ละบริการ
 
 ---
 
-## What is Cloud Computing?
+## Cloud Computing คืออะไร?
 
-Cloud computing is the on-demand delivery of IT resources over the internet with pay-as-you-go pricing.
+Cloud Computing คือการส่งมอบทรัพยากรไอทีตามความต้องการผ่านอินเทอร์เน็ต โดยมีการคิดค่าบริการแบบ Pay-as-you-go
 
-### Service Models
+### รูปแบบบริการ (Service Models)
 
-| Model | Description | Example |
+| รูปแบบ | คำอธิบาย | ตัวอย่าง |
 |-------|-------------|---------|
-| **IaaS** | Infrastructure as a Service — Rent VMs, storage, networks | OpenStack, AWS EC2 |
-| **PaaS** | Platform as a Service — Deploy apps without managing infra | Heroku, OpenShift |
-| **SaaS** | Software as a Service — Use applications over the web | Gmail, Salesforce |
+| **IaaS** | Infrastructure as a Service — เช่า VM, Storage, Network | OpenStack, AWS EC2 |
+| **PaaS** | Platform as a Service — Deploy แอปโดยไม่จัดการ Infrastructure | Heroku, OpenShift |
+| **SaaS** | Software as a Service — ใช้แอปผ่านเว็บ | Gmail, Salesforce |
 
-### Deployment Models
+### รูปแบบการติดตั้ง (Deployment Models)
 
-- **Public Cloud** — Shared infrastructure (AWS, Azure, GCP)
-- **Private Cloud** — Dedicated infrastructure for one organization
-- **Hybrid Cloud** — Combination of public and private
-- **Community Cloud** — Shared among organizations with common concerns
-
----
-
-## OpenStack Overview
-
-!!! quote "OpenStack Mission"
-    To produce the ubiquitous Open Source cloud computing platform that meets the needs of public and private clouds regardless of size.
-
-### History
-
-- **2010** — Joint project by NASA and Rackspace
-- **2012** — OpenStack Foundation formed
-- **2023** — OpenInfra Foundation governs the project
-- **Latest** — Antelope (2023.1), Bobcat (2023.2), Caracal (2024.1)
-
-### Why OpenStack?
-
-✅ Open source — no vendor lock-in  
-✅ Large ecosystem of services  
-✅ Used by thousands of organizations worldwide  
-✅ Strong community support  
-✅ API compatibility with AWS (in many services)
+- **Public Cloud** — Infrastructure แชร์กันใช้ (AWS, Azure, GCP)
+- **Private Cloud** — Infrastructure สำหรับองค์กรเดียว
+- **Hybrid Cloud** — ผสมผสาน Public และ Private
+- **Community Cloud** — แชร์ระหว่างองค์กรที่มีเป้าหมายร่วมกัน
 
 ---
 
-## Core Services Overview
+## ภาพรวม OpenStack
 
-| Service | Codename | Purpose |
+!!! quote "พันธกิจของ OpenStack"
+    สร้างแพลตฟอร์ม Cloud Computing แบบ Open Source ที่เป็นที่นิยมใช้ทั้งในภาครัฐและเอกชน โดยไม่คำนึงถึงขนาด
+
+### ประวัติ
+
+- **2010** — โครงการร่วมระหว่าง NASA และ Rackspace
+- **2012** — ก่อตั้ง OpenStack Foundation
+- **2023** — OpenInfra Foundation ควบคุมโครงการ
+- **ล่าสุด** — Antelope (2023.1), Bobcat (2023.2), Caracal (2024.1)
+
+### ทำไมต้องใช้ OpenStack?
+
+✅ Open Source — ไม่ผูกขาด Vendor  
+✅ Ecosystem บริการกว้างขวาง  
+✅ ใช้งานในหลายพันองค์กรทั่วโลก  
+✅ Community สนับสนุนเข้มแข็ง  
+✅ API รองรับความเข้ากันได้กับ AWS (ในบริการหลายตัว)
+
+---
+
+## ภาพรวมบริการหลัก
+
+| บริการ | ชื่อโค้ด | หน้าที่ |
 |---------|----------|---------|
-| Identity | **Keystone** | Authentication & authorization |
-| Compute | **Nova** | Virtual machine provisioning |
-| Networking | **Neutron** | Network connectivity as a service |
-| Image | **Glance** | VM image storage & retrieval |
-| Block Storage | **Cinder** | Persistent block volumes |
-| Object Storage | **Swift** | Scalable object storage |
-| Dashboard | **Horizon** | Web-based UI |
-| Orchestration | **Heat** | Template-based resource deployment |
-| Telemetry | **Ceilometer** | Metering & monitoring |
+| Identity | **Keystone** | ยืนยันตัวตนและสิทธิ์ |
+| Compute | **Nova** | จัดเตรียม Virtual Machine |
+| Networking | **Neutron** | บริการเชื่อมต่อเครือข่าย |
+| Image | **Glance** | จัดเก็บและจัดการรูป VM |
+| Block Storage | **Cinder** | พื้นที่จัดเก็บ Block แบบถาวร |
+| Object Storage | **Swift** | ระบบจัดเก็บ Object แบบขยายได้ |
+| Dashboard | **Horizon** | หน้า Web UI |
+| Orchestration | **Heat** | จัดสรรทรัพยากรด้วย Template |
+| Telemetry | **Ceilometer** | เก็บข้อมูล Meter และ Monitoring |
 
 ---
 
-## Architecture Overview
+## ภาพรวมสถาปัตยกรรม
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -85,12 +85,12 @@ Cloud computing is the on-demand delivery of IT resources over the internet with
 
 ---
 
-## Slides
+## สไลด์การบรรยาย
 
-📥 [Download Lecture 1 Slides (PDF)](../assets/slides/lecture01.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 1 (PDF)](../assets/slides/lecture01.pdf){ .md-button }
 
-## Further Reading
+## แหล่งข้อมูลเพิ่มเติม
 
 - [OpenStack Documentation](https://docs.openstack.org/)
 - [OpenInfra Foundation](https://openinfra.org/)
-- [Cloud Computing NIST Definition (SP 800-145)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-145.pdf)
+- [คำจำกัดความ Cloud Computing ของ NIST (SP 800-145)](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-145.pdf)

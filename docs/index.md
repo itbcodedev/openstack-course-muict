@@ -1,44 +1,44 @@
-# OpenStack Cloud Computing
+# วิชา OpenStack Cloud Computing
 
-## MUICT | Mahidol University International College of Technology
+## MUICT | คณะเทคโนโลยีสารสนเทศและการสื่อสาร มหาวิทยาลัยมหิดล
 
-Welcome to the OpenStack Cloud Computing course materials repository.
+ยินดีต้อนรับสู่เอกสารประกอบการสอนรายวิชา OpenStack Cloud Computing
 
-!!! info "Course Information"
-    - **Course:** OpenStack Cloud Computing
-    - **Institution:** Mahidol University International College of Technology (MUICT)
-    - **Instructor:** Dr. Sawangpong Muadphet
-    - **Level:** Undergraduate / Graduate
-
----
-
-## Course Overview
-
-This course provides hands-on training in **OpenStack**, the leading open-source cloud computing platform. You will learn to deploy, configure, and manage private and public cloud infrastructure using core OpenStack services.
-
-## What You Will Learn
-
-| Module | Topic |
-|--------|-------|
-| 1 | Introduction to Cloud Computing & OpenStack |
-| 2 | OpenStack Architecture & Core Services |
-| 3 | Identity Management (Keystone) |
-| 4 | Compute Service (Nova) |
-| 5 | Networking (Neutron) |
-| 6 | Block & Object Storage (Cinder & Swift) |
-| 7 | Image Service (Glance) |
-| 8 | Orchestration & Automation (Heat) |
-| 9 | Monitoring & Logging (Ceilometer/Gnocchi) |
-| 10 | Production Deployment & Troubleshooting |
-
-## Quick Links
-
-- [📋 Syllabus](syllabus.md)
-- [🎓 Lectures](lectures/lecture01-introduction.md)
-- [🧪 Hands-on Labs](labs/lab01-devstack.md)
-- [📚 Resources](resources.md)
+!!! info "ข้อมูลรายวิชา"
+    - **รายวิชา:** OpenStack Cloud Computing
+    - **สถาบัน:** คณะเทคโนโลยีสารสนเทศและการสื่อสาร มหาวิทยาลัยมหิดล (MUICT)
+    - **อาจารย์ผู้สอน:** ดร. สวางพงศ์ เหมือดเพชร
+    - **ระดับ:** ปริญญาตรี / ปริญญาโท
 
 ---
 
-!!! tip "Getting Started"
-    New to OpenStack? Start with [Lecture 1: Introduction](lectures/lecture01-introduction.md) and then proceed to [Lab 1: DevStack Installation](labs/lab01-devstack.md).
+## ภาพรวมรายวิชา
+
+รายวิชานี้มุ่งเน้นการฝึกปฏิบัติการในการติดตั้ง กำหนดค่า และบริหารจัดการโครงสร้างพื้นฐาน Cloud โดยใช้ **OpenStack** ซึ่งเป็นแพลตฟอร์ม Cloud Computing แบบ Open Source ที่ได้รับความนิยมสูงสุด
+
+## สาระสำคัญที่จะได้เรียนรู้
+
+| โมดูล | หัวข้อ |
+|--------|--------|
+| 1 | บทนำสู่ Cloud Computing และ OpenStack |
+| 2 | สถาปัตยกรรมและบริการหลักของ OpenStack |
+| 3 | ระบบจัดการตัวตนและสิทธิ์ (Keystone) |
+| 4 | บริการ Compute (Nova) |
+| 5 | ระบบเครือข่าย (Neutron) |
+| 6 | ระบบจัดเก็บข้อมูล Block & Object Storage (Cinder & Swift) |
+| 7 | บริการ Image Service (Glance) |
+| 8 | ระบบจัดการทรัพยากรอัตโนมัติ (Heat) |
+| 9 | ระบบตรวจสอบและบันทึกเหตุการณ์ (Ceilometer/Gnocchi) |
+| 10 | การติดตั้งใช้งานจริงและการแก้ไขปัญหา |
+
+## ลิงก์ด่วน
+
+- [📋 หลักสูตร](syllabus.md)
+- [🎓 การบรรยาย](lectures/lecture01-introduction.md)
+- [🧪 การทดลองปฏิบัติ](labs/lab00-centos-hyperv.md)
+- [📚 แหล่งข้อมูล](resources.md)
+
+---
+
+!!! tip "เริ่มต้นกันเลย"
+    เพิ่งเริ่มเรียน OpenStack? เริ่มที่ [การบรรยายที่ 1: บทนำ](lectures/lecture01-introduction.md) แล้วไปต่อที่ [การทดลองที่ 0: ติดตั้ง CentOS Stream 10 บน Hyper-V](labs/lab00-centos-hyperv.md)

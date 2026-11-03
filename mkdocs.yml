@@ -1,8 +1,8 @@
-site_name: OpenStack Course | MUICT
-site_description: OpenStack Cloud Computing Course Materials - Mahidol University International College of Technology
+site_name: วิชา OpenStack Cloud Computing | MUICT
+site_description: เอกสารประกอบการสอน OpenStack Cloud Computing - คณะเทคโนโลยีสารสนเทศและการสื่อสาร มหาวิทยาลัยมหิดล
 site_url: https://itbcodedev.github.io/openstack-course-muict/
 repo_url: https://github.com/itbcodedev/openstack-course-muict
-repo_name: itbcodedev/openstack-course-muict
+repo_name: GitHub
 
 theme:
   name: material
@@ -13,14 +13,14 @@ theme:
       accent: amber
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: สลับเป็นโหมดมืด
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: indigo
       accent: amber
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: สลับเป็นโหมดสว่าง
   features:
     - navigation.tabs
     - navigation.sections
@@ -64,14 +64,15 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Home: index.md
-  - Syllabus: syllabus.md
-  - Lectures:
+  - หน้าแรก: index.md
+  - หลักสูตร: syllabus.md
+  - การบรรยาย:
     - lectures/lecture01-introduction.md
     - lectures/lecture02-architecture.md
     - lectures/lecture03-keystone.md
-  - Labs:
+  - การทดลอง:
+    - labs/lab00-centos-hyperv.md
     - labs/lab01-devstack.md
     - labs/lab02-horizon.md
     - labs/lab03-cli.md
-  - Resources: resources.md
+  - แหล่งข้อมูล: resources.md
