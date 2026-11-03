@@ -72,11 +72,10 @@ Connection type: Internal network
 - จะกำหนดค่า IP ให้กับอินเทอร์เฟซนี้เมื่อติดตั้ง OpenStack ด้วย DevStack
 - IP ภายในเครือข่าย เช่น 192.168.56.0/24
 
-!!! tip "ตรวจสอบ Virtual Switch"
-    หลังจากสร้างเสร็จ ให้ตรวจสอบว่ามีทั้งหมด 3 switches:
-    - DefaultSwitch (หรือ External)
-    - Internal-Mgmt
-    - Internal-BrEx
+> **ตรวจสอบ Virtual Switch:** หลังจากสร้างเสร็จ ให้ตรวจสอบว่ามีทั้งหมด 3 switches:
+> - DefaultSwitch (หรือ External)
+> - Internal-Mgmt
+> - Internal-BrEx
 
 ---
 
@@ -113,8 +112,7 @@ Hyper-V Manager → Action → New → Virtual Machine
 | Hard Disk | Create a virtual hard disk: 60 GB (VHDX) |
 | Installation Options | Attach ISO: CentOS-Stream-10-latest-x86_64-dvd1.iso |
 
-!!! warning "สำคัญ: ปิด Dynamic Memory"
-    OpenStack ต้องการหน่วยความจำคงที่ ให้ปิด Dynamic memory แล้วตั้งค่า Startup RAM = 8192 MB
+> **สำคัญ: ปิด Dynamic Memory —** OpenStack ต้องการหน่วยความจำคงที่ ให้ปิด Dynamic memory แล้วตั้งค่า Startup RAM = 8192 MB
 
 ### ขั้นตอนที่ 2: เพิ่ม Network Adapter
 
@@ -207,10 +205,10 @@ Network & Host Name
 → Done
 ```
 
-!!! important "จด IP ไว้ใช้ในภายหลัง"
-    - enp0s3 (Default): DHCP - รับ IP อัตโนมัติ
-    - enp0s4 (Mgmt): 10.20.30.11/24
-    - enp0s5 (BrEx): 192.168.56.11/24 — ต้องปิด or ลบ IP นี้ออกหลังติดตั้ง DevStack
+> **จด IP ไว้ใช้ในภายหลัง:**
+> - enp0s3 (Default): DHCP - รับ IP อัตโนมัติ
+> - enp0s4 (Mgmt): 10.20.30.11/24
+> - enp0s5 (BrEx): 192.168.56.11/24 — ต้องปิด or ลบ IP นี้ออกหลังติดตั้ง DevStack
 
 #### ✅ Time & Date
 
@@ -244,8 +242,7 @@ User Creation
 → Done
 ```
 
-!!! warning "แนะนำใช้ชื่อผู้ใช้ stack"
-    DevStack ตั้งค่าให้ติดตั้งภายใต้ผู้ใช้ /opt/stack โดยอัตโนมัติ การใช้ชื่อ **stack** จะทำให้สะดวกขึ้น
+> **แนะนำใช้ชื่อผู้ใช้ stack —** DevStack ตั้งค่าให้ติดตั้งภายใต้ผู้ใช้ /opt/stack โดยอัตโนมัติ การใช้ชื่อ **stack** จะทำให้สะดวกขึ้น
 
 ### ขั้นตอนที่ 3: เริ่มติดตั้ง
 
@@ -314,8 +311,7 @@ sudo setenforce 0
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ```
 
-!!! warning "ห้ามปิด SELinux บน Production"
-    ในสภาพแวดล้อมจริงควรปรับแต่ง SELinux policy แทนการปิด
+> **ห้ามปิด SELinux บน Production —** ในสภาพแวดล้อมจริงควรปรับแต่ง SELinux policy แทนการปิด
 
 ### ขั้นตอนที่ 6: ตั้งค่า sudo สำหรับ stack user
 
