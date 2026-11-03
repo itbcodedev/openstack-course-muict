@@ -1,0 +1,12 @@
+site_name: My Docs
+
+theme: material
+
+plugins:
+  - search  # Material for MkDocs search plugin
+  - pub-debugger
+  - pub-blog
+  - pub-obsidian
+  - pub-social
+  - pub-meta
+  - pub-minifier
