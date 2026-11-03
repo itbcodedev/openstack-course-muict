@@ -33,6 +33,8 @@ Connection type: External network → [เลือกการ์ดเคร�
 ☑ Allow management operating system to share this network adapter
 ```
 
+![ขั้นตอนสร้าง Default Switch](images/lab00-1.png)
+
 ### 2. Internal Management Network
 
 ```
@@ -43,6 +45,8 @@ Connection type: Internal network
 
 - ใช้สำหรับเข้าถึงหน้า Web OpenStack (Horizon Dashboard) และ API ของ OpenStack
 - IP ภายในเครือข่าย เช่น 10.20.30.0/24
+
+![ขั้นตอนสร้าง Internal-Mgmt Switch](images/lab00-2.png)
 
 ### 3. Internal External Network (สำหรับ br-ex ของ Neutron Router)
 
@@ -55,6 +59,10 @@ Connection type: Internal network
 - ใช้เป็น physical interface สำหรับ Neutron br-ex bridge
 - จะกำหนดค่า IP ให้กับอินเทอร์เฟซนี้เมื่อติดตั้ง OpenStack ด้วย DevStack
 - IP ภายในเครือข่าย เช่น 192.168.56.0/24
+
+![ขั้นตอนสร้าง Internal-BrEx Switch](images/lab00-3.png)
+
+![Virtual Switch Manager แสดงทั้ง 3 Switches](images/lab00-4.png)
 
 !!! config ":wrench: ตรวจสอบ Virtual Switch"
     หลังจากสร้างเสร็จ ให้ตรวจสอบว่ามีทั้งหมด 3 switches:
@@ -81,8 +89,22 @@ Hyper-V Manager → Action → New → Virtual Machine
 | Hard Disk | Create a virtual hard disk: 60 GB (VHDX) |
 | Installation Options | Attach ISO: CentOS-Stream-10-latest-x86_64-dvd1.iso |
 
+![สร้าง VM ขั้นตอนที่ 1](images/lab00-5.png)
+
+![เลือก Generation 2](images/lab00-6.png)
+
+![ตั้งค่า RAM 8GB](images/lab00-7.png)
+
+![เลือก Network Adapter](images/lab00-8.png)
+
+![ตั้งค่า Virtual Hard Disk](images/lab00-9.png)
+
+![Attach ISO file](images/lab00-10.png)
+
 !!! warning ":warning: สำคัญ: ปิด Dynamic Memory"
     OpenStack ต้องการหน่วยความจำคงที่ ให้ปิด Dynamic memory แล้วตั้งค่า Startup RAM = 8192 MB
+
+![สรุปการสร้าง VM](images/lab00-11.png)
 
 ### ขั้นตอนที่ 2: เพิ่ม Network Adapter
 
@@ -98,6 +120,12 @@ Settings → Add Hardware → Network Adapter → Add
 
 รวมทั้งหมด 3 Network Adapters
 
+![เพิ่ม Network Adapter ที่ 2](images/lab00-12.png)
+
+![เพิ่ม Network Adapter ที่ 3](images/lab00-13.png)
+
+![VM Settings แสดง 3 Adapters](images/lab00-14.png)
+
 ### ขั้นตอนที่ 3: ปรับแต่งเพิ่มเติม
 
 ```
@@ -111,6 +139,10 @@ Settings:
 └── Checkpoint File Location
     └── กำหนดพื้นที่จัดเก็บ Snapshot
 ```
+
+![ปิด Secure Boot](images/lab00-15.png)
+
+![ตั้งค่า Processor](images/lab00-16.png)
 
 ---
 
@@ -127,6 +159,10 @@ Hyper-V Manager → เลือก VM → Start → Connect
 Settings → Firmware → Boot order: ลาก DVD ขึ้นมาไว้บนสุด
 ```
 
+![Boot จาก ISO](images/lab00-17.png)
+
+![เลือก Install CentOS Stream 10](images/lab00-18.png)
+
 ### ขั้นตอนที่ 2: ติดตั้ง CentOS Stream 10
 
 1. เลือก **Install CentOS Stream 10**
@@ -142,6 +178,10 @@ Installation Destination → Local Standard Disks: เลือกดิสก�
 Storage Configuration: Automatic
 → Done
 ```
+
+![Installation Destination](images/lab00-19.png)
+
+![เลือกดิสก์](images/lab00-20.png)
 
 #### ✅ Network & Host Name
 
@@ -168,17 +208,33 @@ Network & Host Name
     - enp0s4 (Mgmt): 10.20.30.11/24
     - enp0s5 (BrEx): 192.168.56.11/24 — ต้องปิด or ลบ IP นี้ออกหลังติดตั้ง DevStack
 
+![Network & Host Name - รายการอินเทอร์เฟซ](images/lab00-21.png)
+
+![เปิด enp0s3 - DHCP](images/lab00-22.png)
+
+![ตั้งค่า enp0s4 - Manual IP](images/lab00-23.png)
+
+![ตั้งค่า enp0s5 - Manual IP](images/lab00-24.png)
+
+![Network ตั้งค่าเสร็จแล้ว](images/lab00-25.png)
+
 #### ✅ Time & Date
 
 ```
 Time & Date → Region: Asia → City: Bangkok → Network Time: ON → Done
 ```
 
+![Time & Date](images/lab00-26.png)
+
 #### ✅ Software Selection
 
 ```
 Software Selection → Server with GUI → Done
 ```
+
+![Software Selection](images/lab00-27.png)
+
+![เลือก Server with GUI](images/lab00-28.png)
 
 แนะนำเลือก **Server with GUI** เพื่อความสะดวกในการเรียนรู้ หรือเลือก **Minimal Install** หากต้องการเบา
 
@@ -187,6 +243,8 @@ Software Selection → Server with GUI → Done
 ```
 Root Password: ตั้งรหัสผ่านสำหรับ root
 ```
+
+![Root Password](images/lab00-29.png)
 
 #### ✅ User Creation
 
@@ -215,6 +273,12 @@ User Creation
 → Reboot System
 ```
 
+![Begin Installation](images/lab00-32.png)
+
+![ระหว่างติดตั้ง](images/lab00-33.png)
+
+![ติดตั้งเสร็จแล้ว - Reboot](images/lab00-34.png)
+
 !!! tip ":bulb: ตรวจสอบ ISO หลัง Reboot"
     หลังจาก Reboot ให้ปิด VM → Settings → DVD Drive → ลบ ISO ออก → เปิด VM ใหม่
 
@@ -229,6 +293,8 @@ Username: stack
 Password: [รหัสที่ตั้งไว้]
 ```
 
+![เข้าสู่ระบบ CentOS Stream 10](images/lab00-35.png)
+
 ### ขั้นตอนที่ 2: ตรวจสอบ Network Interfaces
 
 เปิด Terminal แล้วรันคำสั่ง:
@@ -242,12 +308,16 @@ ip addr show
 - `enp0s4`: 10.20.30.11 — Management Network
 - `enp0s5`: 192.168.56.11 — External Network (สำหรับ br-ex)
 
+![ตรวจสอบ IP ด้วย ip addr](images/lab00-36.png)
+
 ### ขั้นตอนที่ 3: อัปเดตระบบ
 
 ```bash
 sudo dnf update -y
 sudo dnf install -y epel-release git vim wget curl net-tools bash-completion
 ```
+
+![อัปเดตระบบ](images/lab00-37.png)
 
 ### ขั้นตอนที่ 4: ปิด Firewall (สำหรับ Lab)
 
@@ -263,6 +333,8 @@ sudo firewall-cmd --permanent --add-service=https
 sudo firewall-cmd --reload
 ```
 
+![ปิด Firewall](images/lab00-38.png)
+
 !!! warning ":no_entry: ห้ามปิด Firewall บน Production"
     ในสภาพแวดล้อมจริงควรปรับแต่ง Firewall policy แทนการปิด
 
@@ -272,6 +344,8 @@ sudo firewall-cmd --reload
 sudo setenforce 0
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ```
+
+![ปิด SELinux](images/lab00-39.png)
 
 !!! warning ":no_entry: ห้ามปิด SELinux บน Production"
     ในสภาพแวดล้อมจริงควรปรับแต่ง SELinux policy แทนการปิด
@@ -287,6 +361,8 @@ sudo visudo
 stack ALL=(ALL) NOPASSWD: ALL
 ```
 
+![ตั้งค่า sudo สำหรับ stack user](images/lab00-40.png)
+
 ### ขั้นตอนที่ 7: สร้าง Snapshot
 
 ก่อนติดตั้ง DevStack ให้สร้าง Checkpoint (Snapshot) ไว้:
@@ -294,6 +370,10 @@ stack ALL=(ALL) NOPASSWD: ALL
 ```
 Hyper-V Manager → เลือก VM → Checkpoint → ตั้งชื่อ: "Clean CentOS Stream 10"
 ```
+
+![สร้าง Snapshot](images/lab00-41.png)
+
+![Snapshot เสร็จแล้ว](images/lab00-42.png)
 
 หาก DevStack ติดตั้งไม่สำเร็จ สามารถ Restore กลับมาจุดนี้ได้
 
@@ -309,30 +389,25 @@ Hyper-V Manager → เลือก VM → Checkpoint → ตั้งชื่�
 
 ---
 
-## ภาพประกอบ
+## ภาพประกอบเพิ่มเติม
 
-> **อาจารย์จะ Crop หน้าจอจากขั้นตอนต่าง ๆ มาใส่ในส่วนนี้**
+![เพิ่มเติม 1](images/lab00-43.png)
 
-### ภาพที่ 1: หน้าจอสร้าง Virtual Switch
-![สำหรับใส่ Screenshot: Virtual Switch Manager แสดงทั้ง 3 switches](images/lab00-1.png)
+![เพิ่มเติม 2](images/lab00-44.png)
 
-### ภาพที่ 2: หน้าจอสร้าง VM Generation 2
-![สำหรับใส่ Screenshot: New Virtual Machine Wizard - Generation 2](images/lab00-2.png)
+![เพิ่มเติม 3](images/lab00-45.png)
 
-### ภาพที่ 3: หน้าจอ Settings แสดง 3 Network Adapters
-![สำหรับใส่ Screenshot: VM Settings - 3 Network Adapters](images/lab00-3.png)
+![เพิ่มเติม 4](images/lab00-46.png)
 
-### ภาพที่ 4: หน้าจอติดตั้ง CentOS Stream 10
-![สำหรับใส่ Screenshot: Install CentOS Stream 10](images/lab00-4.png)
+![เพิ่มเติม 5](images/lab00-47.png)
 
-### ภาพที่ 5: หน้าจอ Network & Host Name
-![สำหรับใส่ Screenshot: Network Configuration - 3 interfaces configured](images/lab00-5.png)
+![เพิ่มเติม 6](images/lab00-48.png)
 
-### ภาพที่ 6: หน้าจอ Installation Summary พร้อมตั้งค่าครบถ้วน
-![สำหรับใส่ Screenshot: INSTALLATION SUMMARY - all items configured](images/lab00-6.png)
+![เพิ่มเติม 7](images/lab00-49.png)
 
-### ภาพที่ 7: หน้าจอหลังติดตั้งเสร็จ — เข้าใช้งาน CentOS Stream 10
-![สำหรับใส่ Screenshot: CentOS Stream 10 Desktop with Terminal showing ip addr](images/lab00-7.png)
+![เพิ่มเติม 8](images/lab00-50.png)
+
+![เพิ่มเติม 9](images/lab00-51.png)
 
 ---
 
