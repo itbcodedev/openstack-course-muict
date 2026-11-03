@@ -22,6 +22,13 @@
 
 ก่อนสร้าง VM ให้สร้าง Virtual Switch ทั้งหมด 3 ตัวบน Hyper-V Manager:
 
+![](./images/lab00-1.png)
+
+***Figure 1 กดปุม ทางขวา มือ Virtual Switch Manager สร้าง internal switch ทำหน้าการเชื่อมต่อ ใน layer 2 , และไม่มี DHCP Server เพื่อให้มีการร้องขอ ip ต้องกำหนดเอง***
+
+![](./images/lab00-2.png)
+***Figure 2 สร้าง Internal Virtual Switch จะสร้าง 2 Switch คือ Internal-Mgmt-Net และ Internal-BrEx-Net***
+
 ### 1. Default Switch (เชื่อมต่ออินเทอร์เน็ต)
 
 Hyper-V สร้าง Default Switch มาให้อัตโนมัติ หากไม่มี ให้สร้าง External Switch ที่เชื่อมต่อกับการ์ดเครือข่ายหลัก:
@@ -35,9 +42,14 @@ Connection type: External network → [เลือกการ์ดเคร�
 
 ### 2. Internal Management Network
 
+![](./images/lab00-3.png)
+
+***Figure 3 สร้าง  Internal-Mgmt-Net ให้ตั้งชื่อ อย่างเดียว ส่วน Note จะมีหรือไม่มีก็ได้ ไม่มีผล และให้กด Apply เพื่อเป็นการยืนยัน***
+
+
 ```
 Virtual Switch Manager → New virtual network switch → Internal → Create Virtual Switch
-ชื่อ: Internal-Mgmt
+ชื่อ: Internal-Mgmt-Net
 Connection type: Internal network
 ```
 
@@ -46,9 +58,13 @@ Connection type: Internal network
 
 ### 3. Internal External Network (สำหรับ br-ex ของ Neutron Router)
 
+![](./images/lab00-4.png)
+
+***Figure 4 สร้าง  Internal-BrEx-Net***
+
 ```
 Virtual Switch Manager → New virtual network switch → Internal → Create Virtual Switch
-ชื่อ: Internal-BrEx
+ชื่อ: Internal-BrEx-Net
 Connection type: Internal network
 ```
 
@@ -68,14 +84,30 @@ Connection type: Internal network
 
 ### ขั้นตอนที่ 1: New Virtual Machine Wizard
 
+![](./images/lab00-5.png)
+
 ```
 Hyper-V Manager → Action → New → Virtual Machine
 ```
+![](./images/lab00-6.png)
+
+![](./images/lab00-7.png)
+
+![](./images/lab00-8.png)
+
+![](./images/lab00-9.png)
+
+![](./images/lab00-10.png)
+
+![](./images/lab00-11.png)
+
+![](./images/lab00-12.png)
 
 | ขั้นตอน | ค่าที่ตั้ง |
 |---------|-----------|
-| Name | OpenStack-Controller |
-| Generation | Generation 2 (รองรับ UEFI) |
+| Name | DevStackCentos10Stream |
+| location | D:\Hyper-V\ |
+| Generation | Generation 1 |
 | Memory | 8192 MB (8 GB) — ปิด Dynamic memory (คลิกเครื่องหมายถูกออก) |
 | Network | เลือก DefaultSwitch ก่อน (จะเพิ่มอีก 2 adapters ในขั้นตอนหลัง) |
 | Hard Disk | Create a virtual hard disk: 60 GB (VHDX) |
@@ -88,6 +120,8 @@ Hyper-V Manager → Action → New → Virtual Machine
 
 หลังจากสร้าง VM เสร็จ ให้เปิด **Settings** ของ VM และเพิ่ม Network Adapter อีก 2 ตัว:
 
+![](./images/lab00-13.png)
+
 ```
 Settings → Add Hardware → Network Adapter → Add
 ```
@@ -96,16 +130,26 @@ Settings → Add Hardware → Network Adapter → Add
 - **Network Adapter 2:** Internal-Mgmt
 - **Network Adapter 3:** Internal-BrEx
 
+![](./images/lab00-14.png)
+
+![](./images/lab00-15.png)
+
+![](./images/lab00-16.png)
+
+
 รวมทั้งหมด 3 Network Adapters
+![](./images/lab00-17.png)
 
 ### ขั้นตอนที่ 3: ปรับแต่งเพิ่มเติม
+
+![](./images/lab00-18.png)
 
 ```
 Settings:
 ├── Security
 │   └── Secure Boot: ☐ Uncheck (ปิด Secure Boot — จำเป็นสำหรับ Linux บน Gen 2)
 ├── Processor
-│   └── Number of virtual processors: 2 (หรือ 4 หากมี)
+│   └── Number of virtual processors: 8 (หรือ 4 หากมีไม่พอ)
 ├── Integration Services
 │   └── ☑ Guest services (ช่วยให้ Copy-Paste ระหว่าง Host กับ VM ได้)
 └── Checkpoint File Location

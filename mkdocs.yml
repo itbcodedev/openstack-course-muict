@@ -36,6 +36,9 @@ theme:
     repo: fontawesome/brands/github
   language: en
 
+extra_css:
+  - stylesheets/extra.css
+
 extra:
   social:
     - icon: fontawesome/brands/github
