@@ -1,17 +1,44 @@
-# Welcome to MkDocs
+# OpenStack Cloud Computing
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+## MUICT | Mahidol University International College of Technology
 
-## Commands
+Welcome to the OpenStack Cloud Computing course materials repository.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+!!! info "Course Information"
+    - **Course:** OpenStack Cloud Computing
+    - **Institution:** Mahidol University International College of Technology (MUICT)
+    - **Instructor:** Dr. Sawangpong Muadphet
+    - **Level:** Undergraduate / Graduate
 
-## Project layout
+---
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## Course Overview
+
+This course provides hands-on training in **OpenStack**, the leading open-source cloud computing platform. You will learn to deploy, configure, and manage private and public cloud infrastructure using core OpenStack services.
+
+## What You Will Learn
+
+| Module | Topic |
+|--------|-------|
+| 1 | Introduction to Cloud Computing & OpenStack |
+| 2 | OpenStack Architecture & Core Services |
+| 3 | Identity Management (Keystone) |
+| 4 | Compute Service (Nova) |
+| 5 | Networking (Neutron) |
+| 6 | Block & Object Storage (Cinder & Swift) |
+| 7 | Image Service (Glance) |
+| 8 | Orchestration & Automation (Heat) |
+| 9 | Monitoring & Logging (Ceilometer/Gnocchi) |
+| 10 | Production Deployment & Troubleshooting |
+
+## Quick Links
+
+- [📋 Syllabus](syllabus.md)
+- [🎓 Lectures](lectures/lecture01-introduction.md)
+- [🧪 Hands-on Labs](labs/lab01-devstack.md)
+- [📚 Resources](resources.md)
+
+---
+
+!!! tip "Getting Started"
+    New to OpenStack? Start with [Lecture 1: Introduction](lectures/lecture01-introduction.md) and then proceed to [Lab 1: DevStack Installation](labs/lab01-devstack.md).

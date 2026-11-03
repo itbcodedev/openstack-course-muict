@@ -1,12 +1,77 @@
-site_name: My Docs
+site_name: OpenStack Course | MUICT
+site_description: OpenStack Cloud Computing Course Materials - Mahidol University International College of Technology
+site_url: https://itbcodedev.github.io/openstack-course-muict/
+repo_url: https://github.com/itbcodedev/openstack-course-muict
+repo_name: itbcodedev/openstack-course-muict
 
-theme: material
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+  language: en
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/itbcodedev
+  generator: false
 
 plugins:
-  - search  # Material for MkDocs search plugin
-  - pub-debugger
-  - pub-blog
-  - pub-obsidian
-  - pub-social
-  - pub-meta
-  - pub-minifier
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Syllabus: syllabus.md
+  - Lectures:
+    - lectures/lecture01-introduction.md
+    - lectures/lecture02-architecture.md
+    - lectures/lecture03-keystone.md
+  - Labs:
+    - labs/lab01-devstack.md
+    - labs/lab02-horizon.md
+    - labs/lab03-cli.md
+  - Resources: resources.md
