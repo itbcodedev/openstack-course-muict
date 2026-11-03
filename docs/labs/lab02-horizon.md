@@ -121,7 +121,7 @@
 4. คลิก **Associate** → เลือก `vm-01`
 5. คลิก **Associate**
 
-!!! success "ทดสอบการเชื่อมต่อ"
+!!! success ":white_check_mark: ทดสอบการเชื่อมต่อ"
     จากเครื่อง Host (Windows):
     ```bash
     ping <FLOATING_IP>
@@ -150,13 +150,12 @@
 
 ---
 
-## การบ้าน
+!!! homework ":clipboard: การบ้าน"
+    📋 **รายงานการทดลอง:**
 
-📋 **รายงานการทดลอง:**
-
-1. Screenshot หน้า Project Overview
-2. Screenshot แสดง `student-net` network topology
-3. Screenshot `vm-01` กำลังทำงานพร้อม Floating IP
-4. Screenshot SSH session ภายใน VM
-5. ตอบคำถาม: Private network ต่างจาก Public (external) network อย่างไร?
-6. ตอบคำถาม: ทำไมต้องมี router เชื่อมระหว่างทั้งสอง?
+    1. Screenshot หน้า Project Overview
+    2. Screenshot แสดง `student-net` network topology
+    3. Screenshot `vm-01` กำลังทำงานพร้อม Floating IP
+    4. Screenshot SSH session ภายใน VM
+    5. ตอบคำถาม: Private network ต่างจาก Public (external) network อย่างไร?
+    6. ตอบคำถาม: ทำไมต้องมี router เชื่อมระหว่างทั้งสอง?

@@ -4,7 +4,7 @@
 
 ยินดีต้อนรับสู่เอกสารประกอบการสอนรายวิชา OpenStack Cloud Computing
 
-!!! info "ข้อมูลรายวิชา"
+!!! info ":information_source: ข้อมูลรายวิชา"
     - **รายวิชา:** OpenStack Cloud Computing
     - **สถาบัน:** คณะเทคโนโลยีสารสนเทศและการสื่อสาร มหาวิทยาลัยมหิดล (MUICT)
     - **อาจารย์ผู้สอน:** ดร. สวางพงศ์ เหมือดเพชร
@@ -40,5 +40,5 @@
 
 ---
 
-!!! tip "เริ่มต้นกันเลย"
+!!! tip ":bulb: เริ่มต้นกันเลย"
     เพิ่งเริ่มเรียน OpenStack? เริ่มที่ [การบรรยายที่ 1: บทนำ](lectures/lecture01-introduction.md) แล้วไปต่อที่ [การทดลองที่ 0: ติดตั้ง CentOS Stream 10 บน Hyper-V](labs/lab00-centos-hyperv.md)

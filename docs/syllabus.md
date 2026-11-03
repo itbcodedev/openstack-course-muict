@@ -57,17 +57,10 @@
 
 ## เงื่อนไขเบื้องต้น
 
-- เชี่ยวชาญการใช้งาน Command Line ของ Linux
-- เครือข่ายเบื้องต้น (TCP/IP, VLANs, Routing)
-- คุ้นเคยกับการเขียน Python Script
-- แนวคิด Virtualization (KVM, QEMU)
-
-## เครื่องมือที่ต้องใช้
-
-- คอมพิวเตอร์แล็ปท็อปพร้อม Hyper-V และ RAM 16 GB+
-- Virtual Machine CentOS Stream 10 (RAM 8 GB, Disk 60 GB)
-- SSH Client และ Terminal Access
-- บัญชี GitHub สำหรับส่งงาน
+- Linux command line proficiency
+- Basic networking (TCP/IP, VLANs, routing)
+- Familiarity with Python scripting
+- Virtualization concepts (KVM, QEMU)
 
 ## สภาพแวดล้อมที่ใช้ในรายวิชา
 
@@ -78,3 +71,10 @@
 | Cloud Platform | OpenStack (DevStack) |
 | Virtualization | KVM (Nested ใน Hyper-V) |
 | Networking | Neutron with Open vSwitch |
+
+---
+
+!!! exam ":fire: ห้ามสอบคัดลอก"
+    การสอบปลายภาคเป็นการสอบปฏิบัติการแก้ไขปัญหา (Troubleshooting) บน VM จริง
+    นักศึกษาต้องเข้าไปแก้ไขปัญหาที่อาจารย์สร้างไว้ภายในเวลาที่กำหนด
+    ห้ามสื่อสารกันระหว่างสอบ ห้ามใช้อินเทอร์เน็ต

@@ -107,11 +107,11 @@ LOGDAYS=2
 EOF
 ```
 
-!!! tip "สำคัญ: ปรับ HOST_IP"
+!!! config ":gear: สำคัญ: ปรับ HOST_IP"
     ปรับ `HOST_IP` ให้ตรงกับ IP ของ Management Interface (enp0s4) บน VM ของคุณ
     ใช้คำสั่ง `ip addr show enp0s4` เพื่อตรวจสอบ
 
-!!! tip "รหัสผ่าน"
+!!! config ":lock: รหัสผ่าน"
     เปลี่ยน `ADMIN_PASSWORD` ให้ปลอดภัย ในตัวอย่างใช้ `Muict@2024` ค่าอื่น ๆ จะใช้รหัสเดียวกันเพื่อความสะดวกใน Lab
 
 ---
@@ -201,7 +201,7 @@ openstack keypair create --public-key ~/.ssh/devstack_key.pub devstack_key
 openstack security group rule create --protocol tcp --dst-port 22 \
   --remote-ip 0.0.0.0/0 default
 
-#  запустить VM
+# สร้าง VM
 openstack server create \
   --image cirros-0.6.2-x86_64-disk \
   --flavor m1.tiny \
@@ -256,15 +256,14 @@ Hyper-V Manager → คลิกขวาที่ VM → Restore → เลื�
 
 ---
 
-## การบ้าน
+!!! homework ":clipboard: การบ้าน"
+    📋 **รายงานการทดลอง:**
 
-📋 **รายงานการทดลอง:**
+    1. Screenshot หน้า Horizon Dashboard หลังจากเข้าสู่ระบบสำเร็จ
+    2. Screenshot รายการ `openstack compute service list`
+    3. Screenshot รายการ `openstack network agent list`
+    4. Screenshot `openstack server list` แสดง vm-01 กำลังทำงาน
+    5. ตอบคำถาม: `HOST_IP` ใน `local.conf` มีหน้าที่อะไร?
+    6. ตอบคำถาม: ทำไมต้องมี 2 อินเทอร์เฟซแยกกัน (Mgmt vs External)?
 
-1. Screenshot หน้า Horizon Dashboard หลังจากเข้าสู่ระบบสำเร็จ
-2. Screenshot รายการ `openstack compute service list`
-3. Screenshot รายการ `openstack network agent list`
-4. Screenshot `openstack server list` แสดง vm-01 กำลังทำงาน
-5. ตอบคำถาม: `HOST_IP` ใน `local.conf` มีหน้าที่อะไร?
-6. ตอบคำถาม: ทำไมต้องมี 2 อินเทอร์เฟซแยกกัน (Mgmt vs External)?
-
-ส่งผ่าน: [Google Classroom / LMS]
+    ส่งผ่าน: [Google Classroom / LMS]

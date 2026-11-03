@@ -298,12 +298,11 @@ openstack server list
 
 ---
 
-## การบ้าน
+!!! homework ":clipboard: การบ้าน"
+    📋 **รายงานการทดลอง:**
 
-📋 **รายงานการทดลอง:**
-
-1. Output ของ `openstack server list` หลังจากสร้าง Instances
-2. Screenshot หรือ Output แสดง Floating IP ที่ผูกไว้
-3. Output จาก Script สร้าง VMs แบบ Batch
-4. ตอบคำถาม: `openstack server stop` ต่างจาก `openstack server suspend` อย่างไร?
-5. ตอบคำถาม: ทำไมถึงมีประโยชน์ที่จะใช้ `--wait` ใน Script อัตโนมัติ?
+    1. Output ของ `openstack server list` หลังจากสร้าง Instances
+    2. Screenshot หรือ Output แสดง Floating IP ที่ผูกไว้
+    3. Output จาก Script สร้าง VMs แบบ Batch
+    4. ตอบคำถาม: `openstack server stop` ต่างจาก `openstack server suspend` อย่างไร?
+    5. ตอบคำถาม: ทำไมถึงมีประโยชน์ที่จะใช้ `--wait` ใน Script อัตโนมัติ?
