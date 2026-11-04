@@ -50,17 +50,17 @@
 | 10 | Ceilometer / Gnocchi — การตรวจสอบ | Metrics และ Alarms |
 | 11 | การติดตั้งระดับ Production (Kolla-Ansible) | OpenStack แบบ Containerized |
 | 12 | การแก้ไขปัญหาและแนวปฏิบัติที่ดี | Scenarios การ Debug |
-| 13 | นำเสนอโครงงานนักศึกษา | — |
-| 14 | สอบปลายภาค | — |
+| 13 | นำเสนอโครงงาน รายงาน | เลือก ทำ Report  |
+| 14 | สอบปลายภาค | ไม่มี  |
 
 ---
 
 ## เงื่อนไขเบื้องต้น
 
-- Linux command line proficiency
-- Basic networking (TCP/IP, VLANs, routing)
-- Familiarity with Python scripting
-- Virtualization concepts (KVM, QEMU)
+- เข้าใจ Linux command line 
+- เข้าใจ Basic networking (TCP/IP, VLANs, routing) ,  Switch Layer 2, Switch Layer 3
+- ความรู้โปรแกรมภาษา Python scripting
+- หลักการทำงาน และ การสร้าง Virtualization ของ Hyper V
 
 ## สภาพแวดล้อมที่ใช้ในรายวิชา
 

@@ -7,8 +7,8 @@
 !!! info ":information_source: ข้อมูลรายวิชา"
     - **รายวิชา:** OpenStack Cloud Computing
     - **สถาบัน:** คณะเทคโนโลยีสารสนเทศและการสื่อสาร มหาวิทยาลัยมหิดล (MUICT)
-    - **อาจารย์ผู้สอน:** ดร. สวางพงศ์ เหมือดเพชร
-    - **ระดับ:** ปริญญาตรี / ปริญญาโท
+    - **อาจารย์ผู้สอน:** อ. สวางพงศ์  หมวดเพชร
+    - **ระดับ:** ปริญญาตรี 
 
 ---
 
@@ -21,14 +21,14 @@
 | โมดูล | หัวข้อ |
 |--------|--------|
 | 1 | บทนำสู่ Cloud Computing และ OpenStack |
-| 2 | สถาปัตยกรรมและบริการหลักของ OpenStack |
-| 3 | ระบบจัดการตัวตนและสิทธิ์ (Keystone) |
-| 4 | บริการ Compute (Nova) |
-| 5 | ระบบเครือข่าย (Neutron) |
-| 6 | ระบบจัดเก็บข้อมูล Block & Object Storage (Cinder & Swift) |
-| 7 | บริการ Image Service (Glance) |
-| 8 | ระบบจัดการทรัพยากรอัตโนมัติ (Heat) |
-| 9 | ระบบตรวจสอบและบันทึกเหตุการณ์ (Ceilometer/Gnocchi) |
+| 2 | สถาปัตยกรรมและบริการหลักของ OpenStack [https://docs.openstack.org/nova/rocky/admin/arch.html](https://docs.openstack.org/nova/rocky/admin/arch.html) |
+| 3 | ระบบจัดการตัวตนและสิทธิ์ (Keystone) [https://docs.openstack.org/keystone/latest/getting-started/architecture.html](https://docs.openstack.org/keystone/latest/getting-started/architecture.html) |
+| 4 | บริการ Compute (Nova) [https://docs.openstack.org/nova/latest/admin/architecture.html](https://docs.openstack.org/nova/latest/admin/architecture.html) |
+| 5 | ระบบเครือข่าย (Neutron) [https://docs.openstack.org/neutron/latest/](https://docs.openstack.org/neutron/latest/) |
+| 6 | ระบบจัดเก็บข้อมูล Block & Object Storage (Cinder & Swift) [https://docs.openstack.org/cinder/latest/](https://docs.openstack.org/cinder/latest/) |
+| 7 | บริการ Image Service (Glance) [https://docs.openstack.org/glance/latest/](https://docs.openstack.org/glance/latest/)|
+| 8 | ระบบจัดการทรัพยากรอัตโนมัติ (Heat) [https://docs.openstack.org/releasenotes/heat/2026.1.html](https://docs.openstack.org/releasenotes/heat/2026.1.html)|
+| 9 | ระบบตรวจสอบและบันทึกเหตุการณ์ (Ceilometer/Gnocchi) [https://docs.openstack.org/ceilometer/latest/contributor/architecture.html](https://docs.openstack.org/ceilometer/latest/contributor/architecture.html) |
 | 10 | การติดตั้งใช้งานจริงและการแก้ไขปัญหา |
 
 ## ลิงก์ด่วน
