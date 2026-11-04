@@ -210,7 +210,7 @@ openstack alarm-history show high-cpu-alarm
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 10 (PDF)](../assets/slides/lecture10.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 10 (PDF)](../assets/slides/OpenStack_Telemetry_Architecture.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

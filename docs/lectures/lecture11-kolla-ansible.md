@@ -219,7 +219,7 @@ openstack network agent list
 
 ```bash
 # 1. เปลี่ยน openstack_release ใน globals.yml
-openstack_release: "2024.2"
+openstack_release: "2026.2"
 
 # 2. Pull Images ใหม่
 kolla-ansible -i multinode pull
@@ -232,7 +232,7 @@ kolla-ansible -i multinode upgrade
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 11 (PDF)](../assets/slides/lecture11.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 11 (PDF)](../assets/slides/การติดตั้งระดับ%20Production%20ด้วย%20Kolla-Ansible.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

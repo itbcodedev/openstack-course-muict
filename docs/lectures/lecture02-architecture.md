@@ -110,7 +110,7 @@ Libvirt/KVM สร้าง VM บน hypervisor
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 2 (PDF)](../assets/slides/lecture02.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 2 (PDF)](../assets/slides/OpenStack_Nova_Architecture_Blueprint.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

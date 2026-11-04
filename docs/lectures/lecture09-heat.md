@@ -304,7 +304,7 @@ resources:
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 9 (PDF)](../assets/slides/lecture09.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 9 (PDF)](../assets/slides/OpenStack_Heat_Architecture.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

@@ -177,7 +177,7 @@ swift upload -H "X-Delete-After:86400" my-container temp.log
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 8 (PDF)](../assets/slides/lecture08.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 8 (PDF)](../assets/slides/OpenStack_Swift_Architecture.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

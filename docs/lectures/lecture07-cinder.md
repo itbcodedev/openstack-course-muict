@@ -204,7 +204,7 @@ openstack server create \
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 7 (PDF)](../assets/slides/lecture07.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 7 (PDF)](../assets/slides/OpenStack_Cinder_Architecture.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

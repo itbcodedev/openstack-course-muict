@@ -245,7 +245,7 @@ openstack quota set --gigabytes 500 <project-id>
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 6 (PDF)](../assets/slides/lecture06.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 6 (PDF)](../assets/slides/OpenStack_Glance_Architecture.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

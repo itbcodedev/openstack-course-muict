@@ -143,7 +143,7 @@ openstack token issue
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 3 (PDF)](../assets/slides/lecture03.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 3 (PDF)](../assets/slides/Keystone%20ระบบจัดการตัวตนและสิทธิ์.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

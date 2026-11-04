@@ -39,7 +39,12 @@ Cloud Computing คือการส่งมอบทรัพยากรไ�
 - **2010** — โครงการร่วมระหว่าง NASA และ Rackspace
 - **2012** — ก่อตั้ง OpenStack Foundation
 - **2023** — OpenInfra Foundation ควบคุมโครงการ
-- **ล่าสุด** — Antelope (2023.1), Bobcat (2023.2), Caracal (2024.1)
+- **ล่าสุด** 
+    - Epoxy (2025.1) – Apr 2025
+    - Flamingo (2025.2) – Oct 2025
+    - Gazpacho (2026.1) – Apr 2026
+    - Hibiscus (2026.2) – Sep 2026
+    - Indri (2027.1) – Mar 2027 (estimated)
 
 ### ทำไมต้องใช้ OpenStack?
 
@@ -65,6 +70,7 @@ Cloud Computing คือการส่งมอบทรัพยากรไ�
 | Orchestration | **Heat** | จัดสรรทรัพยากรด้วย Template |
 | Telemetry | **Ceilometer** | เก็บข้อมูล Meter และ Monitoring |
 
+![](./images/OpenStack_Map.jpg)
 ---
 
 ## ภาพรวมสถาปัตยกรรม
@@ -82,12 +88,117 @@ Cloud Computing คือการส่งมอบทรัพยากรไ�
 │  Hypervisor (KVM/QEMU)  │  Linux Bridge / OVS           │
 └─────────────────────────────────────────────────────────┘
 ```
+![](./images/Interface-Overview.png)
+
+---
+## Logical Architecture
+
+![](./images/openstack-arch-kilo-logical-v1.png)
 
 ---
 
+**OpenStack** เป็นระบบปฏิบัติการคลาวด์โอเพนซอร์ส (Open-source Cloud Operating System) ขนาดใหญ่ ที่รวบรวมบริการต่างๆ (Services) เข้ามาทำงานร่วมกันเพื่อสร้างและบริหารจัดการ Infrastructure as a Service (IaaS) ทั้งระบบ Compute, Storage และ Networking ผ่านแดชบอร์ดหรือ API
+
+สำหรับสถาปัตยกรรมของ OpenStack (OpenStack Architecture) ได้รับการออกแบบมาให้เป็นแบบ **Modular (แยกตามหน้าที่)** และ **Scale-out (ขยายออกด้านข้างได้ง่าย)** โดยประกอบด้วย Core Services หลักๆ และสถาปัตยกรรมภาพรวมดังนี้ครับ
+
+---
+
+### 1. สถาปัตยกรรมภาพรวม (Conceptual Architecture)
+
+ในทางปฏิบัติ โหนด (Node) ใน OpenStack จะถูกแบ่งหน้าที่ออกเป็นหลักๆ ดังนี้:
+
+* **Controller Node:** สมองกลของระบบ ทำหน้าที่รัน API, Authentication (Keystone), Dashboard (Horizon), และ Orchestration ต่างๆ รวมถึง Database (MariaDB) และ Message Queue (RabbitMQ)
+* **Compute Node (Hypervisor):** โหนดที่ใช้รัน Virtual Machines (VMs) จริงๆ โดยมักใช้ KVM (Kernel-based Virtual Machine) หรือ QEMU
+* **Network Node (Neutron):** โหนดที่จัดการระบบเครือข่าย เורเร้าเตอร์ (Virtual Routers), DHCP, และ Floating IPs (สามารถรวมกับ Controller หรือแยกเดี่ยวก็ได้ขึ้นอยู่กับการออกแบบ)
+* **Storage Nodes:**
+* **Block Storage Node (Cinder):** จัดเตรียมพื้นที่เก็บข้อมูลแบบ Block สำหรับต่อพ่วงกับ VM (คล้าย Hard Disk)
+* **Object Storage Node (Swift):** จัดเก็บข้อมูลแบบไม่มีโครงสร้าง เช่น ไฟล์, รูปภาพ, หรือ Backup (คล้าย S3)
+
+
+
+---
+
+### 2. Core Services หลักใน OpenStack Architecture
+
+การทำงานของ OpenStack จะอาศัยบริการเหล่านี้สื่อสารกันผ่าน REST API และส่งข้อความหากันผ่าน Message Broker (RabbitMQ):
+
+1. **Dashboard (Horizon):**
+* *หน้าที่:* เว็บ UI สำหรับให้ผู้ใช้ (User) และผู้ดูแลระบบ (Admin) เข้ามาจัดการทรัพยากร
+
+
+2. **Compute (Nova):**
+* *หน้าที่:* หัวใจหลักในการสร้างและจัดการวงจรชีวิตของ Virtual Machine (VM Instances) ควบคุมการเปิด-ปิด, Migration และเชื่อมต่อกับ Hypervisor
+
+
+3. **Networking (Neutron):**
+* *หน้าที่:* บริการจัดการระบบเครือข่ายเสมือน (Software-Defined Networking - SDN) รองรับการสร้าง VLAN, VXLAN, Subnets, Routers, Firewalls และ Floating IPs
+
+
+4. **Block Storage (Cinder):**
+* *หน้าที่:* จัดการพื้นที่จัดเก็บข้อมูลแบบ Block Storage (Volumes) ที่สามารถ Attach/Detach เข้ากับ VM ได้ตลอดเวลา
+
+
+5. **Object Storage (Swift):**
+* *หน้าที่:* จัดเก็บข้อมูลแบบ Object ที่มีความทนทานสูง เหมาะสำหรับเก็บข้อมูลขนาดใหญ่ที่ไม่ค่อยเปลี่ยนแปลง
+
+
+6. **Shared File Systems (Manila):** (บริการเสริมยอดนิยม)
+* *หน้าที่:* จัดการระบบแชร์ไฟล์ผ่านเครือข่าย เช่น NFS, CIFS ให้กับ VM หลายๆ ตัวพร้อมกัน
+
+
+7. **Identity (Keystone):**
+* *หน้าที่:* ระบบยืนยันตัวตน (Authentication) และสิทธิ์การใช้งาน (Authorization) ของทุกบริการใน OpenStack
+
+
+8. **Image (Glance):**
+* *หน้าที่:* คลังเก็บอิมเมจของระบบปฏิบัติการ (OS Images เช่น Ubuntu, CentOS, Windows) สำหรับนำไปใช้วิเคราะห์หรือสร้าง VM
+
+
+9. **Telemetry (Ceilometer / Aodh):**
+* *หน้าที่:* จัดเก็บข้อมูลสถิติ การใช้งานทรัพยากร (Metering & Monitoring) เพื่อทำ Billing หรือ Auto-scaling
+
+
+
+---
+
+### 3. ส่วนประกอบสนับสนุนเบื้องหลัง (Underlying Infrastructure)
+
+สถาปัตยกรรมภายในของ OpenStack ต้องพึ่งพาซอฟต์แวร์พื้นฐานสำคัญ 3 ตัวนี้ในการขับเคลื่อน:
+
+* **Database (MariaDB / MySQL):** เก็บสถานะและข้อมูลทั้งหมดของระบบ OpenStack
+* **Message Queue (RabbitMQ):** ใช้สำหรับการสื่อสารแบบ Asynchronous ระหว่าง Service ต่างๆ ภายในระบบ (เช่น เมื่อ Nova สั่งงาน Compute Node จะผ่านคิวนี้)
+* **Hypervisor (KVM / QEMU):** ตัวจำลองฮาร์ดแวร์บน Linux Compute Node
+
+---
+
+### 4. คำแนะนำในการออกแบบและการนำไปใช้งาน (Best Practices)
+
+1. **การแบ่งแยกเน็ตเวิร์ก (Network Separation):**
+ในระดับสถาปัตยกรรม ควรแยกวงแลน (VLANs/Subnets) ออกจากกันอย่างเด็ดขาด เพื่อความปลอดภัยและประสิทธิภาพ:
+* **Management Network:** สำหรับให้ Service ต่างๆ คุยกันเองและดูแลระบบ
+* **Data/Tunnel Network (VXLAN/Geneve):** สำหรับส่งข้อมูลทราฟฟิกของ VM ระหว่าง Compute Nodes
+* **External/Public Network:** สำหรับให้ VM ออกอินเทอร์เน็ตหรือเข้าถึงผ่าน Floating IP
+* **Storage Network:** สำหรับรับส่งข้อมูลระหว่าง Compute และ Storage (เช่น NFS หรือ Ceph)
+
+
+2. **High Availability (HA):**
+* สำหรับ **Production Environment** ไม่ควรติดตั้ง Controller บนเครื่องเดียว ควรทำเป็น Cluster (เช่น 3 Nodes) พร้อมทำ Load Balancer ด้านหน้าสำหรับ API
+* ใช้ **Ceph Storage** เป็น backend สำหรับทั้ง Glance, Cinder และ Nova (Ephemeral Storage) เพื่อความทนทานและการทำ Live Migration ได้อย่างราบรื่น
+
+
+3. **เครื่องมือช่วยติดตั้ง (Deployment Tools):**
+การติดตั้ง OpenStack แบบManual (ด้วยมือทีละตัว) ค่อนข้างซับซ้อน ปัจจุบันนิยมใช้เครื่องมือเหล่านี้:
+* **Kolla-Ansible:** (แนะนำสูงสุดในปัจจุบัน) ติดตั้งบริการทุกตัวในรูปแบบ **Docker Containers** บน Ansible ทำให้ดูแลรักษาง่าย อัปเกรดง่าย และมีความเสถียรสูง
+* **DevStack:** เหมาะสำหรับใช้นักพัฒนาทดสอบรันบนเครื่องเดียว (All-in-one) บน VirtualBox หรือ KVM
+* **TripleO (OpenStack-on-OpenStack):** เหมาะสำหรับ Data Center ขนาดใหญ่มาก
+
+
+
+หากคุณกำลังวางแผนโปรเจกต์เฉพาะทาง (เช่น สร้าง Private Cloud สำหรับงาน IoT, ระบบ AI/ML, หรือระบบประมวลผลภายในองค์กร) สามารถแจ้งรายละเอียดเพิ่มเติมได้ครับ เพื่อจะได้ลงลึกในส่วนสถาปัตยกรรมที่เหมาะสมที่สุดครับ
+
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 1 (PDF)](../assets/slides/lecture01.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 1 (PDF)](../assets/slides/สถาปัตยกรรม_OpenStack_Nova.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

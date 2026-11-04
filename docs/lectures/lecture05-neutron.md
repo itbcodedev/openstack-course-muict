@@ -247,10 +247,11 @@ openstack server add floating ip vm1 $FLOATING_IP
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 5 (PDF)](../assets/slides/lecture05.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 5 (PDF)](../assets/slides/OpenStack_Neutron_Architecture.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 
 - [Neutron Documentation](https://docs.openstack.org/neutron/latest/)
+- [Neutron Document pdf](../assets/slides/doc-neutron.pdf)
 - [Open vSwitch](https://www.openvswitch.org/)
 - [Neutron Networking Guide](https://docs.openstack.org/neutron/latest/admin/)

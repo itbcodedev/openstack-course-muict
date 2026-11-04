@@ -247,7 +247,7 @@ sudo rabbitmqctl list_queues | grep -i "nova"
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 12 (PDF)](../assets/slides/lecture12.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 12 (PDF)](../assets/slides/Troubleshoot_OpenStack.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 

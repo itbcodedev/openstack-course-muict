@@ -200,7 +200,7 @@ openstack server migrate my-instance
 
 ## สไลด์การบรรยาย
 
-📥 [ดาวน์โหลดสไลด์การบรรยายที่ 4 (PDF)](../assets/slides/lecture04.pdf){ .md-button }
+📥 [ดาวน์โหลดสไลด์การบรรยายที่ 4 (PDF)](../assets/slides/OpenStack_Nova_Architecture_Blueprint.pdf){ .md-button }
 
 ## แหล่งข้อมูลเพิ่มเติม
 
