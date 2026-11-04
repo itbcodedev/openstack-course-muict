@@ -79,6 +79,12 @@ nav:
     - lectures/lecture04-nova.md
     - lectures/lecture05-neutron.md
     - lectures/lecture06-glance.md
+    - lectures/lecture07-cinder.md
+    - lectures/lecture08-swift.md
+    - lectures/lecture09-heat.md
+    - lectures/lecture10-ceilometer.md
+    - lectures/lecture11-kolla-ansible.md
+    - lectures/lecture12-troubleshooting.md
   - การทดลอง:
     - labs/lab00-centos-hyperv.md
     - labs/lab01-devstack.md
