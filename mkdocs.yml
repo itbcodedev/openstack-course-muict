@@ -76,6 +76,9 @@ nav:
     - lectures/lecture01-introduction.md
     - lectures/lecture02-architecture.md
     - lectures/lecture03-keystone.md
+    - lectures/lecture04-nova.md
+    - lectures/lecture05-neutron.md
+    - lectures/lecture06-glance.md
   - การทดลอง:
     - labs/lab00-centos-hyperv.md
     - labs/lab01-devstack.md
