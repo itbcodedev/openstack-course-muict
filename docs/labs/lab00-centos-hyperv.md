@@ -15,7 +15,8 @@
 | หน่วยความจำ (RAM) | แนะนำ 16 GB ขึ้นไป |
 | พื้นที่ดิสก์ | มีพื้นที่ว่าง 60 GB ขึ้นไป |
 | ไฟล์ ISO | CentOS-Stream-10-latest-x86_64-dvd1.iso |
-
+| user |  stack  password=muictP@ssw0rd |
+| access ip |  172.24.90.184  |
 ---
 
 ## สร้าง Virtual Switch บน Hyper-V
@@ -104,13 +105,13 @@ Hyper-V Manager → Action → New → Virtual Machine
 
 | ขั้นตอน | ค่าที่ตั้ง |
 |---------|-----------|
-| Name | DevStackCentos10Stream |
+| Name | DevStackCentos9Stream |
 | location | D:\Hyper-V\ |
 | Generation | Generation 1 |
 | Memory | 8192 MB (8 GB) — ปิด Dynamic memory (คลิกเครื่องหมายถูกออก) |
 | Network | เลือก DefaultSwitch ก่อน (จะเพิ่มอีก 2 adapters ในขั้นตอนหลัง) |
 | Hard Disk | Create a virtual hard disk: 60 GB (VHDX) |
-| Installation Options | Attach ISO: CentOS-Stream-10-latest-x86_64-dvd1.iso |
+| Installation Options | Attach ISO: CentOS-Stream-9-20260714.1-x86_64-boot.iso    |
 
 > **สำคัญ: ปิด Dynamic Memory —** OpenStack ต้องการหน่วยความจำคงที่ ให้ปิด Dynamic memory แล้วตั้งค่า Startup RAM = 8192 MB
 
@@ -166,11 +167,12 @@ Hyper-V Manager → เลือก VM → Start → Connect
 ![](./images/lab00-19.png)
 
 
-### ขั้นตอนที่ 2: ติดตั้ง CentOS Stream 10
+### ขั้นตอนที่ 2: ติดตั้ง CentOS Stream 9
 
-1. เลือก **Install CentOS Stream 10**
+1. เลือก **Install CentOS Stream 9**
 ![](./images/lab00-20.png)
 2. เลือกภาษา: **English** (แนะนำ) หรือ Thai
+
 ![](./images/lab00-21.png)
 3. **INSTALLATION SUMMARY** — ตั้งค่าตามลำดับ:
 
@@ -182,7 +184,9 @@ Storage Configuration: Automatic
 → Done
 ```
 ![](./images/lab00-22.png)
+
 ![](./images/lab00-23.png)
+
 - สร้าง จาก Template auto
 ![](./images/lab00-24.png)
 - ลบ Home
@@ -227,22 +231,26 @@ Network & Host Name
 
 ![](./images/lab00-32.png)
 
+fix ip eth0  172.24.83.37 / 20  , Gatewat 172.24.80.1
+
 ![](./images/lab00-33.png)
 
 ![](./images/lab00-34.png)
 
+Fix ip ให้ eth1  10.0.0.10
 ![](./images/lab00-35.png)
-
+Set static ให้ eth2
 ![](./images/lab00-36.png)
 
+Fix ip eth2  192.168.56.10
 ![](./images/lab00-37.png)
 
 ![](./images/lab00-38.png)
 
 **จด IP ไว้ใช้ในภายหลัง:**  
-- eth0 (Default): DHCP - รับ IP อัตโนมัติ  
-- eth1 (Mgmt): 10.20.30.11/24  
-- eth2 (BrEx): 192.168.56.11/24 — ต้องปิด or ลบ IP นี้ออกหลังติดตั้ง DevStack  
+- eth0 (Default): DHCP - รับ IP อัตโนมัติ จาก hyperV แล้ว เปลี่ยนมาเป็น  Static 
+- eth1 (Mgmt): 10.0.0.10/24  
+- eth2 (BrEx): 192.168.56.10/24 — ต้องปิด or ลบ IP นี้ออกหลังติดตั้ง DevStack  
 
 #### ✅ Time & Date
 
@@ -256,23 +264,18 @@ Time & Date → Region: Asia → City: Bangkok → Network Time: ON → Done
 ```
 Software Selection → Server with GUI → Done
 ```
-![](./images/lab00-40.png)
-
-- เพิ่ม installation source:  https://mirror1.ku.ac.th/centos-stream/10-stream/BaseOS/x86_64/os/  
-
-![](./images/lab00-41.png)
-
-![](./images/lab00-42.png)
-
 ![](./images/lab00-43.png)
+
 - แนะนำเลือก **Server with GUI** และ **Development Tools**
+
+
 ![](./images/lab00-44.png)
 
 
 #### ✅ Root Password
 
 ```
-Root Password: ตั้งรหัสผ่านสำหรับ root
+Root Password: ตั้งรหัสผ่านสำหรับ root   muictP@ssw0rd
 ```
 ![](./images/lab00-45.png)
 ![](./images/lab00-46.png)
@@ -290,13 +293,15 @@ User Creation
 ```
 
 ![](./images/lab00-47.png)
+
 ![](./images/lab00-48.png)
 
 
 > **แนะนำใช้ชื่อผู้ใช้ stack —** DevStack ตั้งค่าให้ติดตั้งภายใต้ผู้ใช้ /opt/stack โดยอัตโนมัติ การใช้ชื่อ **stack** จะทำให้สะดวกขึ้น
 
 ![](./images/lab00-49.png)
-- เสร็จสิ้นการตั้งค่า user
+
+- เสร็จสิ้นการตั้งค่า user เริ่่มต้นการติดตั้ง
 ![](./images/lab00-50.png)
 
 ### ขั้นตอนที่ 3: เริ่มติดตั้ง
@@ -320,11 +325,11 @@ User Creation
 
 ## ตั้งค่าหลังติดตั้ง (Post-Installation)
 
-### ขั้นตอนที่ 1: เข้าสู่ระบบ
-
+### ขั้นตอนที่ 1: login เข้าสู่ระบบ
+ 
 ```
 Username: stack
-Password: [รหัสที่ตั้งไว้]
+Password: muictP@ssw0rd
 ```
 ![](./images/lab00-53.png)
 
@@ -340,15 +345,32 @@ ip addr show
 
 ควรเห็น 3 interfaces:  
 - `eth0`: มี IP จาก STATIC (เชื่อมต่ออินเทอร์เน็ตได้)  
-- `eth1`: 10.20.30.11 — Management Network  
-- `eth2`: 192.168.56.11 — External Network (สำหรับ br-ex)  
+- `eth1`: 10.0.0.10 — Management Network  
+- `eth2`: 192.168.56.10 — External Network (สำหรับ br-ex)  
 
 ### ขั้นตอนที่ 3: อัปเดตระบบ
+
+```
+ssh stack@172.24.84.37
+pwd
+sudo chmod 755 /opt/stack
+```
+![](./images/lab00-55.png)
 
 ```bash
 sudo dnf update -y
 sudo dnf install -y epel-release git vim wget curl net-tools bash-completion
+
+sudo dnf install -y python3-pip
 ```
+## Check python version
+```
+python --verion
+pip --version
+which python
+```
+
+![](./images/lab00-56.png)
 
 ### ขั้นตอนที่ 4: ปิด Firewall (สำหรับ Lab)
 
@@ -371,6 +393,8 @@ sudo setenforce 0
 sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 ```
 
+![](./images/lab00-57.png)
+
 > **ห้ามปิด SELinux บน Production —** ในสภาพแวดล้อมจริงควรปรับแต่ง SELinux policy แทนการปิด
 
 ### ขั้นตอนที่ 6: ตั้งค่า sudo สำหรับ stack user
@@ -379,10 +403,12 @@ sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
 sudo visudo
 ```
 
-เพิ่มบรรทัดนี้ลงไป:
+เพิ่มบรรทัดนี้ลงไป :
 ```
 stack ALL=(ALL) NOPASSWD: ALL
 ```
+
+![](./images/lab00-58.png)
 
 ### ขั้นตอนที่ 7: สร้าง Snapshot
 
@@ -400,52 +426,13 @@ Hyper-V Manager → เลือก VM → Checkpoint → ตั้งชื่�
 
 | Adapter | Virtual Switch | Interface | IP Address | หมายเหตุ |
 |---------|---------------|-----------|------------|----------|
-| Adapter 1 | DefaultSwitch | enp0s3 | DHCP | เชื่อมต่ออินเทอร์เน็ต |
-| Adapter 2 | Internal-Mgmt | enp0s4 | 10.20.30.11/24 | Management Network / Horizon |
-| Adapter 3 | Internal-BrEx | enp0s5 | 192.168.56.11/24 | Neutron br-ex bridge |
+| Adapter 1 | DefaultSwitch | eth0 | DHCP | เชื่อมต่ออินเทอร์เน็ต |
+| Adapter 2 | Internal-Mgmt | eth1 | 10.0.0.10/24 | Management Network / Horizon |
+| Adapter 3 | Internal-BrEx | eth1 | 192.168.56.10/24 | Neutron br-ex bridge |
 
 ---
 
-## ภาพประกอบ (รอการฝัง)
 
-> **อาจารย์จะ Crop หน้าจอจากขั้นตอนต่าง ๆ มาใส่ในส่วนนี้**
-
-### ภาพที่ 1: หน้าจอสร้าง Virtual Switch
-```
-[สำหรับใส่ Screenshot: Virtual Switch Manager แสดงทั้ง 3 switches]
-```
-
-### ภาพที่ 2: หน้าจอสร้าง VM Generation 2
-```
-[สำหรับใส่ Screenshot: New Virtual Machine Wizard - Generation 2]
-```
-
-### ภาพที่ 3: หน้าจอ Settings แสดง 3 Network Adapters
-```
-[สำหรับใส่ Screenshot: VM Settings - 3 Network Adapters]
-```
-
-### ภาพที่ 4: หน้าจอติดตั้ง CentOS Stream 10
-```
-[สำหรับใส่ Screenshot: Install CentOS Stream 10]
-```
-
-### ภาพที่ 5: หน้าจอ Network & Host Name
-```
-[สำหรับใส่ Screenshot: Network Configuration - 3 interfaces configured]
-```
-
-### ภาพที่ 6: หน้าจอ Installation Summary พร้อมตั้งค่าครบถ้วน
-```
-[สำหรับใส่ Screenshot: INSTALLATION SUMMARY - all items configured]
-```
-
-### ภาพที่ 7: หน้าจอหลังติดตั้งเสร็จ — เข้าใช้งาน CentOS Stream 10
-```
-[สำหรับใส่ Screenshot: CentOS Stream 10 Desktop with Terminal showing ip addr]
-```
-
----
 
 ## เอกสารอ้างอิง
 
@@ -459,11 +446,11 @@ Hyper-V Manager → เลือก VM → Checkpoint → ตั้งชื่�
 
 ก่อนดำเนินการ [Lab 1: ติดตั้ง DevStack](lab01-devstack.md) ให้ตรวจสอบรายการนี้:
 
-- [ ] CentOS Stream 10 ติดตั้งเสร็จสมบูรณ์
+- [ ] CentOS Stream 9 ติดตั้งเสร็จสมบูรณ์
 - [ ] ทั้ง 3 network interfaces ตอบสนอง (ใช้ `ip addr` ตรวจสอบ)
 - [ ] สามารถ ping ออกอินเทอร์เน็ตได้
-- [ ] SSH เข้าเครื่องได้จาก Host (ผ่าน IP ของ enp0s3 หรือ enp0s4)
-- [ ] สร้าง Snapshot "Clean CentOS Stream 10" แล้ว
+- [ ] SSH เข้าเครื่องได้จาก Host (ผ่าน IP ของ eth0 หรือ eth1)
+- [ ] สร้าง Backup "Clean CentOS Stream 9" แล้ว
 - [ ] ผู้ใช้ `stack` มีสิทธิ์ sudo โดยไม่ต้องใส่รหัสผ่าน
 - [ ] SELinux อยู่ในโหมด permissive
 - [ ] Firewall ปิด (หรือเปิดพอร์ตที่จำเป็น)
