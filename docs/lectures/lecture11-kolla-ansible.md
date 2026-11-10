@@ -1,234 +1,133 @@
-# การบรรยายที่ 11: การติดตั้งระดับ Production ด้วย Kolla-Ansible
+# การบรรยายที่ 11: ติดตั้ง OpenStack ด้วย Kolla-Ansible
 
 ## วัตถุประสงค์การเรียนรู้
 
-- เข้าใจความแตกต่างระหว่าง DevStack และ Production Deployment
-- รู้จัก Kolla-Ansible และ Containerized OpenStack
-- อธิบายสถาปัตยกรรม Production: HA, Load Balancing, TLS
-- เตรียม Inventory และ Deploy OpenStack ด้วย Ansible Playbooks
+- อธิบายว่า Kolla-Ansible ติดตั้ง OpenStack อย่างไร และเลือกใช้ต่างจาก DevStack ในงานใด
+- อ่าน Inventory, การตั้งค่าเครือข่าย และผลของ Prechecks
+- ตรวจสอบ OpenStack Hibiscus (2026.2) แบบ All-in-One ตั้งแต่ Container จนถึง OpenStack API
 
----
+## Kolla-Ansible ทำอะไร?
 
-## DevStack vs Production
+ในบทก่อนเราใช้ DevStack เพื่อเรียนรู้บริการของ OpenStack บทนี้เปลี่ยนมาดูงานของผู้ดูแลระบบว่า **จะติดตั้งบริการชุดเดียวกันซ้ำได้อย่างไร** โครงการ **Kolla** สร้าง Container Images ของบริการ ส่วน **Kolla-Ansible** ใช้ Ansible เพื่อเตรียมโฮสต์ สร้างไฟล์ตั้งค่า และรันบริการจาก Images เหล่านั้น
 
-| ด้าน | DevStack | Production |
-|------|----------|-----------|
-| **วัตถุประสงค์** | พัฒนา/ทดสอบ | ใช้งานจริง |
-| **Node** | 1 Node | Multi-node |
-| **HA** | ไม่มี | มี (Redundant Controllers) |
-| **Storage** | Loopback/LVM | Ceph/NFS/iSCSI |
-| **Network** | Single Flat | VLAN/VXLAN + External |
-| **Security** | ไม่มี TLS | TLS ทุก Service |
-| **Deployment** | Shell Script | Ansible/Kolla/Puppet |
+| คำถาม | DevStack | Kolla-Ansible |
+|---|---|---|
+| ใช้ทำอะไร? | พัฒนาและทดสอบ OpenStack รวมถึงงาน Lab | ติดตั้งและดูแล OpenStack ด้วย Container ทั้งแบบประเมินผลและแบบใช้งานจริง |
+| กำหนดค่าที่ไหน? | `local.conf` และปลั๊กอิน DevStack | Inventory, `globals.yml` และไฟล์ตั้งค่าอื่นตามบริการ |
+| ใช้กี่เครื่อง? | Lab ของคอร์สใช้เครื่องเดียว | เริ่มจาก All-in-One แล้วแยกบทบาทไปหลายโฮสต์ได้ |
 
----
+## จาก All-in-One ไปสู่ Production
 
-## Kolla-Ansible คืออะไร?
+Inventory บอกว่าโฮสต์ใดทำหน้าที่อะไร ใน All-in-One โฮสต์เดียวทำหลายบทบาท เมื่อแยกหลายโฮสต์ ให้อ้างอิง Inventory `multinode` ของ Kolla-Ansible รุ่นที่ใช้
 
-**Kolla-Ansible** เป็นเครื่องมือ Deploy OpenStack ใน Docker Containers:
+| บทบาท | สิ่งที่รับผิดชอบ |
+|---|---|
+| **Control** | API, Identity, Scheduler และบริการประกอบ เช่น MariaDB และ RabbitMQ ตามการตั้งค่า |
+| **Compute** | รัน VM ผ่าน Nova Compute และ Hypervisor |
+| **Network** | เชื่อมต่อเครือข่ายภายนอกตาม Backend และ Topology ที่เลือก เช่น OVN Gateway |
+| **Storage** | จัดเก็บข้อมูลตาม Backend ที่เลือก ตัวอย่างเช่นใช้ Ceph ที่เตรียมและดูแลแยกจาก Kolla-Ansible |
 
-- **Containerized** — แต่ละ Service รันใน Docker Container
-- **Immutable** — อัปเกรดโดยเปลี่ยน Image ไม่ต้องแก้ไข Server
-- **Production Ready** — รองรับ HA, TLS, Rolling Upgrades
-- **Ansible-based** — ใช้ Ansible Playbooks จัดการทั้งหมด
-- **Pre-built Images** — มี Official Images จาก OpenStack
+ในระบบหลายโฮสต์ **HAProxy** กระจายคำขอ API และ **Keepalived** ดูแล Virtual IP (VIP) ตามการตั้งค่า เมื่อมีเพียงโฮสต์เดียว VIP ใช้เป็นที่อยู่สำหรับเข้าถึง API ได้ แต่ไม่มีโฮสต์สำรองเมื่อเครื่องเสีย ระบบ Production ยังต้องออกแบบ Quorum ของบริการที่เกี่ยวข้อง วางแผน TLS และทดสอบ Failover กับการกู้คืนจริง
 
----
+### ไฟล์สำคัญ
 
-## สถาปัตยกรรม Production
+| ไฟล์ | คำถามที่ใช้ตอบ |
+|---|---|
+| `all-in-one` หรือ `multinode` | Ansible จะรันงานบนโฮสต์ใดและให้แต่ละโฮสต์รับบทบาทอะไร? |
+| `/etc/kolla/globals.yml` | ใช้ Release, Container Image, Interface และ VIP ใด? |
+| `/etc/kolla/passwords.yml` | ใช้ข้อมูลลับอะไรกับบริการต่าง ๆ? |
+| `/etc/kolla/clouds.yaml` | OpenStack CLI ใช้ Endpoint และ Credentials ใดหลังติดตั้ง? |
 
-```
-┌─────────────────────────────────────────┐
-│         Load Balancer (HAProxy)          │
-│         Keepalived (VIP)                  │
-└──────────────────┬──────────────────────┘
-                   │
-┌──────────────────▼──────────────────────┐
-│  Controller 1    │  Controller 2        │
-│  MariaDB (Galera)│  MariaDB (Galera)    │
-│  RabbitMQ       │  RabbitMQ            │
-│  Keystone API   │  Keystone API        │
-│  Nova API       │  Nova API            │
-│  Neutron Server │  Neutron Server      │
-│  Horizon        │  Horizon             │
-│  Memcached      │  Memcached           │
-└─────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────┐
-│  Compute Node 1  │  Compute Node 2     │
-│  Nova Compute     │  Nova Compute        │
-│  Neutron L2 Agent │ Neutron L2 Agent     │
-│  Neutron L3 Agent │ Neutron L3 Agent     │
-│  Cinder Volume    │ Cinder Volume        │
-│  (KVM + OVS)      │ (KVM + OVS)          │
-└─────────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────┐
-│  Storage Node (Ceph / NFS)             │
-│  OSD 1, OSD 2, OSD 3                   │
-│  Cinder Backend / Glance Backend        │
-└─────────────────────────────────────────┘
-```
+## Workshop ท้ายบท — ตรวจการติดตั้ง Kolla-Ansible Hibiscus
 
----
+**เวลา** 60–90 นาทีสำหรับ Prechecks และตรวจผลบนระบบที่ผู้สอนเตรียม · **รูปแบบ** กลุ่มละ 2–3 คน การติดตั้งเต็มเป็นงานสาธิตหรือ Lab เพิ่มเติมตามเวลาและความเร็วในการดาวน์โหลด Images
 
-## ส่วนประกอบ Kolla
+### สิ่งที่ผู้สอนเตรียม
 
-| ส่วนประกอบ | หน้าที่ |
-|-----------|------|
-| **kolla-build** | สร้าง Docker Images |
-| **kolla-ansible** | Deploy และ Manage Containers |
-| **kolla-ansible inventory** | กำหนดบทบาทของแต่ละ Node |
-| **globals.yml** | ตั้งค่าทั่วไปของ Deployment |
-| **passwords.yml** | เก็บรหัสผ่านทั้งหมด |
+- ใช้ VM หรือเครื่อง **Ubuntu 24.04 LTS x86_64 แยกจาก DevStack** พร้อม Snapshot ก่อนติดตั้ง คู่มือระบุขั้นต่ำ 2 Network Interfaces, RAM 8 GB และพื้นที่ดิสก์ 40 GB ตรวจทรัพยากรเพิ่มหากจะบูต Instance และตรวจ `/dev/kvm` หากจะใช้ KVM ใน VM ซ้อน
+- จัดเตรียม Management Interface ที่มี IP และใช้เข้าถึงโฮสต์ พร้อม VIP ที่ยังไม่มีผู้ใช้บนเครือข่ายเดียวกัน เตรียม External Interface ที่เปิดใช้งานแต่ไม่มี IP และใช้เฉพาะ Lab เพราะ Kolla จะนำไปผูกกับ Bridge ของ Neutron
+- เตรียมสิทธิ์ `sudo` สำหรับการติดตั้ง และเตรียมเครื่อง All-in-One ที่ Deploy สำเร็จแล้วเป็นทางเลือกสำหรับช่วงตรวจผล เก็บ Lab ไว้บนเครือข่ายแยกหากใช้การตั้งค่า HTTP ตาม Quick Start
 
----
+### ขั้นที่ 1 — อ่าน Inventory และวางแผนเครือข่าย
 
-## ขั้นตอน Deploy ด้วย Kolla-Ansible
-
-### 1. ติดตั้งสภาพแวดล้อม
+บนเครื่อง Lab ใหม่ รันตาม [Quick Start 2026.2](https://docs.openstack.org/kolla-ansible/2026.2/user/quickstart) ใช้ชุดคำสั่งนี้เพื่อเตรียม Kolla-Ansible รุ่นของ Hibiscus
 
 ```bash
-# ติดตั้ง Dependencies
-sudo dnf install -y python3-pip git
-pip3 install --user kolla-ansible
+sudo apt update
+sudo apt install git python3-dev libffi-dev gcc libssl-dev \
+  libdbus-glib-1-dev python3-venv
+python3 -m venv ~/kolla-2026.2-venv
+source ~/kolla-2026.2-venv/bin/activate
+python -m pip install -U pip
+python -m pip install 'git+https://opendev.org/openstack/kolla-ansible@stable/2026.2'
+kolla-ansible install-deps
 
-# สร้าง Directory
-mkdir -p /etc/kolla
-cp -r ~/.local/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
-cp ~/.local/share/kolla-ansible/ansible/inventory/* .
+mkdir -p ~/kolla-lab
+cd ~/kolla-lab
+sudo mkdir -p /etc/kolla
+sudo chown "$(id -un):$(id -gn)" /etc/kolla
+cp -r "$VIRTUAL_ENV"/share/kolla-ansible/etc_examples/kolla/* /etc/kolla/
+cp "$VIRTUAL_ENV"/share/kolla-ansible/ansible/inventory/all-in-one .
+ansible-inventory -i ./all-in-one --graph
+ip -br address
+ip route
 ```
 
-### 2. กำหนด Inventory
-
-```ini
-# multinode inventory
-[control]
-ctrl01 ansible_host=10.0.0.11
-ctrl02 ansible_host=10.0.0.12
-ctrl03 ansible_host=10.0.0.13
-
-[network]
-ctrl01 ansible_host=10.0.0.11
-ctrl02 ansible_host=10.0.0.12
-ctrl03 ansible_host=10.0.0.13
-
-[compute]
-comp01 ansible_host=10.0.0.21
-comp02 ansible_host=10.0.0.22
-
-[storage]
-stg01 ansible_host=10.0.0.31
-
-[mariadb:children]
-control
-
-[rabbitmq:children]
-control
-
-[keystone:children]
-control
-
-[glance:children]
-control
-
-[nova:children]
-control
-
-[neutron:children]
-network
-
-[cinder:children]
-control
-
-[horizon:children]
-control
-```
-
-### 3. ตั้งค่า globals.yml
+ดูว่า `localhost` อยู่ในกลุ่มใดบ้าง จากนั้นแก้ค่าต่อไปนี้ใน **`/etc/kolla/globals.yml`** โดยใช้ชื่อ Interface และ VIP ของเครื่องจริง หากมี Key อยู่แล้วให้แก้รายการเดิม
 
 ```yaml
-# /etc/kolla/globals.yml
-kolla_base_distro: "centos"
-kolla_install_type: "source"
-openstack_release: "2024.1"
-
-# Network
-kolla_internal_vip_address: "10.0.0.10"
-network_interface: "eth0"
-neutron_external_interface: "eth1"
-
-# Storage
-enable_cinder: "yes"
-cinder_backend_lvm: "yes"
-enable_ceph: "no"
-
-# Services
-enable_haproxy: "yes"
-enable_keepalived: "yes"
-enable_memcached: "yes"
-enable_rabbitmq: "yes"
-
-# TLS (Production)
-enable_tls: "yes"
-kolla_enable_tls: "yes"
+kolla_base_distro: "ubuntu"
+openstack_release: "2026.2"
+network_interface: "REPLACE_WITH_MANAGEMENT_INTERFACE"
+neutron_external_interface: "REPLACE_WITH_DEDICATED_EXTERNAL_INTERFACE"
+kolla_internal_vip_address: "REPLACE_WITH_UNUSED_MANAGEMENT_IP"
 ```
 
-### 4. สร้างรหัสผ่าน
+จดว่า Interface ใดใช้เข้าถึงโฮสต์ Interface ใดให้ Neutron ใช้ และ IP ใดเป็น VIP ของ API ระวังอย่าเลือก Interface ที่ใช้ SSH เป็น External Interface
+
+### ขั้นที่ 2 — Bootstrap และ Prechecks
 
 ```bash
 kolla-genpwd
-# แก้ไข passwords.yml ถ้าต้องการกำหนดเอง
+chmod 600 /etc/kolla/passwords.yml
+kolla-ansible bootstrap-servers -i ./all-in-one
+kolla-ansible prechecks -i ./all-in-one
 ```
 
-### 5. Bootstrap และ Deploy
+Bootstrap เตรียมโฮสต์และ Container Engine ส่วน Prechecks ตรวจเงื่อนไขก่อนติดตั้ง หากพบข้อผิดพลาด ให้จดชื่อ Task และสาเหตุที่แสดง แล้วแก้ตามผลก่อนรัน Prechecks ซ้ำ เมื่อผ่านจึงเริ่ม Deploy หรือย้ายไปเครื่องที่ผู้สอนเตรียมไว้สำหรับขั้นถัดไป
+
+### ขั้นที่ 3 — Deploy และตรวจผลจากสองมุม
+
+บนเครื่องที่ผ่าน Prechecks แล้ว ผู้สอนสามารถสาธิตการติดตั้งและสร้างไฟล์ Credentials ด้วยคำสั่งต่อไปนี้ รัน Post-deploy เมื่อ Deploy สำเร็จ
 
 ```bash
-# ตรวจสอบ Inventory
-ansible -i multinode all -m ping
-
-# Bootstrap Servers (ติดตั้ง Docker, NTP, etc.)
-kolla-ansible -i multinode bootstrap-servers
-
-# Prechecks
-kolla-ansible -i multinode prechecks
-
-# Deploy OpenStack
-kolla-ansible -i multinode deploy
-
-# Post-deploy (สร้าง Keystone Endpoints, OpenRC)
-kolla-ansible -i multinode post-deploy
+kolla-ansible deploy -i ./all-in-one
+kolla-ansible post-deploy -i ./all-in-one
+python -m pip install python-openstackclient \
+  -c https://releases.openstack.org/constraints/upper/2026.2
 ```
 
-### 6. ใช้งาน OpenStack
+ในตัวอย่างที่ใช้ Docker ให้ตรวจ Container จากโฮสต์ แล้วทดสอบ API ผ่าน CLI ด้วยบัญชี Lab ที่ผู้สอนจัดให้ หากใช้ไฟล์จาก Post-deploy ให้ตรวจชื่อ Profile ใน `/etc/kolla/clouds.yaml` บนเครื่องและแทนค่าด้านล่าง เก็บไฟล์ Credentials ไว้ในเครื่องที่ได้รับอนุญาต
 
 ```bash
-# โหลด OpenRC
-source /etc/kolla/admin-openrc.sh
+sudo docker ps --format 'table {{.Names}}\t{{.Status}}'
 
-# ตรวจสอบ Services
-openstack service list
-openstack endpoint list
-openstack compute service list
-openstack network agent list
+export OS_CLIENT_CONFIG_FILE=/etc/kolla/clouds.yaml
+CLOUD='REPLACE_WITH_LAB_CLOUD_PROFILE'
+openstack --os-cloud "$CLOUD" service list
+openstack --os-cloud "$CLOUD" endpoint list --service identity
+openstack --os-cloud "$CLOUD" compute service list
 ```
 
----
+เทียบชื่อ Container กับ Service ที่ลงทะเบียนใน Keystone ตรวจว่า Endpoint ของ Identity ใช้ที่อยู่ใด และดูว่า `nova-compute` รายงาน `up` หรือไม่ หากผู้สอนเตรียม Image, Flavor, Network และ Project สำหรับผู้เรียนไว้แล้ว ให้สร้าง VM ทดสอบตาม [Workshop บทที่ 1](lecture01-introduction.md) เพื่อยืนยันถึงขั้นบูต Guest แล้วลบ VM ของกลุ่มหลังเก็บหลักฐาน
 
-## การ Upgrade
+### งานส่ง
 
-```bash
-# 1. เปลี่ยน openstack_release ใน globals.yml
-openstack_release: "2026.2"
+ส่งผล Prechecks หรือระบุว่าใช้เครื่องที่ Deploy ไว้แล้ว พร้อมตาราง **บทบาทโฮสต์ / Interface / VIP** และหลักฐานสองระดับคือสถานะ Container กับผลตอบกลับจาก OpenStack API อธิบายว่า **เหตุใด Container ที่แสดง Up จึงยังต้องตรวจ API และสถานะ Compute เพิ่ม**
 
-# 2. Pull Images ใหม่
-kolla-ansible -i multinode pull
+## การอัปเกรด
 
-# 3. Rolling Upgrade
-kolla-ansible -i multinode upgrade
-```
-
----
+ก่อนอัปเกรด ให้ตรวจเส้นทางที่รองรับจากรุ่นต้นทางไปปลายทาง อ่าน Release Notes สำรองฐานข้อมูลและไฟล์ตั้งค่า และทดสอบบนระบบแยก คู่มือของรุ่นปลายทางเป็นตัวกำหนดลำดับการอัปเกรด ซึ่งรวมถึงรุ่น Kolla-Ansible และการเปลี่ยนแปลงที่บริการต้องทำ การเปลี่ยนค่า `openstack_release` เพียงอย่างเดียวจึงไม่ครบกระบวนการ
 
 ## สไลด์การบรรยาย
 
@@ -236,6 +135,6 @@ kolla-ansible -i multinode upgrade
 
 ## แหล่งข้อมูลเพิ่มเติม
 
-- [Kolla-Ansible Documentation](https://docs.openstack.org/kolla-ansible/latest/)
-- [Kolla Quick Start](https://docs.openstack.org/kolla-ansible/latest/user/quickstart.html)
-- [OpenStack HA Guide](https://docs.openstack.org/ha-guide/latest/)
+- [Kolla-Ansible 2026.2 — Quick Start](https://docs.openstack.org/kolla-ansible/2026.2/user/quickstart)
+- [Kolla-Ansible 2026.2 — Support Matrix](https://docs.openstack.org/kolla-ansible/2026.2/user/support-matrix)
+- [Kolla-Ansible 2026.2 — Release Notes](https://docs.openstack.org/releasenotes/kolla-ansible/2026.2.html)
