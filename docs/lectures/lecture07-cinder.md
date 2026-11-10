@@ -2,205 +2,105 @@
 
 ## วัตถุประสงค์การเรียนรู้
 
-- เข้าใจบทบาทของ Cinder ในการจัดสรร Block Storage
-- รู้จัก Backend Drivers: LVM, NFS, Ceph, iSCSI
-- สร้างและจัดการ Volumes, Snapshots และ Backups
-- ผูก Volume เข้ากับ VM (Attach/Detach)
+- แยกหน้าที่ของ Image, ดิสก์ระบบ และ Data Volume
+- อธิบายว่า Cinder และ Nova ทำงานร่วมกันอย่างไรเมื่อ Attach Volume
+- ย้าย Volume ระหว่าง VM สองเครื่องและตรวจสอบว่าข้อมูลยังอยู่
 
----
+## Cinder ทำอะไร?
 
-## Cinder คืออะไร?
+ใน [Lecture 06](lecture06-glance.md) เราใช้ Image เป็นต้นแบบบูต VM ถ้าต้องการแยกข้อมูลของแอปออกจากดิสก์ระบบ ให้สร้าง **Data Volume** ด้วย Cinder แล้ว Attach เข้า VM ระบบปฏิบัติการจะเห็นเป็นอุปกรณ์แบบ Block Device และสามารถสร้าง Filesystem หรือใช้เป็นดิสก์ให้แอปได้
 
-**Cinder** เป็นบริการ Block Storage ของ OpenStack ให้บริการ:
+| ทรัพยากร | ใช้ทำอะไร | วงจรชีวิต |
+|---|---|---|
+| **Glance Image** | ต้นแบบสำหรับบูต VM หรือสร้าง Boot Volume | มี Image UUID ของตนเอง |
+| **Root Disk ที่ Nova จัดการ** | เก็บ OS และไฟล์บนดิสก์ระบบเมื่อบูตจาก Image โดยตรง | ผูกกับ Instance และถูกลบเมื่อ Instance ถูกลบ |
+| **Cinder Volume** | เป็น Data Disk หรือ Root Disk เมื่อเลือก Boot from Volume | มี Volume UUID แยกจาก Instance โดยการลบพร้อม VM ขึ้นกับการตั้งค่า Delete on Termination |
 
-- **Persistent Block Devices** — ดิสก์ที่คงทนของ VM (คงอยู่แม้ลบ VM)
-- **Volume Lifecycle** — Create, Attach, Detach, Extend, Snapshot, Backup, Delete
-- **Multiple Backends** — LVM, NFS, Ceph RBD, iSCSI, FC
-- **Storage QoS** — กำหนดคุณภาพบริการของ Storage
+## จากคำขอสร้าง Volume ถึงดิสก์ใน VM
 
----
+1. **cinder-api** รับคำขอ เช่น สร้าง Volume ขนาด 1 GiB
+2. **cinder-scheduler** เลือก Backend ตาม Volume Type, ความจุ และเงื่อนไขที่กำหนด
+3. **cinder-volume** เรียก Driver เพื่อสร้างหรือจัดการ Volume บน Backend เช่น LVM, Ceph RBD หรือ NFS ส่วน iSCSI และ Fibre Channel เป็นวิธีเชื่อมต่อ Storage ที่บาง Driver ใช้
+4. เมื่อสั่ง **Attach** ผ่าน Nova ระบบประสานกับ Cinder เพื่อให้ Compute Host เชื่อมต่อ Volume และให้ VM เห็นเป็นดิสก์ จากนั้น Guest OS จัดการ Filesystem และ Mount Point
 
-## สถาปัตยกรรม Cinder
+**Volume Type** คือชุดคุณสมบัติที่ผู้ดูแลกำหนด เช่น นโยบายเลือก Backend หรือความสามารถ Multiattach ที่ต้องรองรับทั้ง Type และ Backend ในกิจกรรมนี้ใช้ Volume ปกติที่แนบทีละ VM
 
-```
-┌─────────────────────────────────────────┐
-│         cinder-api                      │
-│   (รับ REST API requests)               │
-└──────────────────┬──────────────────────┘
-                   │
-┌──────────────────▼──────────────────────┐
-│         cinder-scheduler                │
-│   (เลือก Backend ที่เหมาะสม)            │
-└──────────────────┬──────────────────────┘
-                   │ ผ่าน Message Queue
-┌──────────────────▼──────────────────────┐
-│         cinder-volume                   │
-│   (จัดการ Volume บน Backend Storage)    │
-│   - LVM, Ceph, NFS, iSCSI, FC           │
-├─────────────────────────────────────────┤
-│         cinder-backup                   │
-│   (สำรอง Volume ไปยัง Object Store)      │
-└─────────────────────────────────────────┘
-```
+## Snapshot, Backup และ Boot from Volume
 
-### ส่วนประกอบ
+| หัวข้อ | ใช้เมื่อใด |
+|---|---|
+| **Volume Snapshot** | เก็บจุดอ้างอิงของข้อมูลบน Volume แล้วใช้สร้าง Volume ใหม่ได้ ควรหยุดงานเขียนและทำให้ข้อมูลของแอปอยู่ในสถานะที่สอดคล้องกันก่อน Snapshot |
+| **Volume Backup** | สำรองข้อมูลผ่าน `cinder-backup` ไปยังปลายทางที่ตั้งค่าไว้ เช่น Swift, Ceph หรือ NFS การแยกความเสี่ยงขึ้นกับตำแหน่งปลายทางจริง |
+| **Instance Snapshot** | ใช้เก็บสถานะดิสก์สำหรับสร้าง Instance ใหม่ วิธีจัดเก็บขึ้นกับแหล่งบูตของ VM การทำ Snapshot แบบนี้ไม่บันทึก RAM หรือสถานะการทำงานของ CPU |
+| **Boot from Volume** | ใช้ Cinder Volume เป็นดิสก์ระบบ เช่น สร้าง Volume จาก Glance Image ก่อนบูต การย้ายโฮสต์ยังขึ้นกับ Backend และการตั้งค่าของ Nova |
 
-| ส่วนประกอบ | หน้าที่ |
-|-----------|------|
-| **cinder-api** | รับและตรวจสอบ API requests |
-| **cinder-scheduler** | เลือก Backend Host ที่เหมาะสม |
-| **cinder-volume** | จัดการ Volume บน Storage Backend โดยตรง |
-| **cinder-backup** | สำรอง Volume ไปยัง Swift หรือ Object Store |
+หากขยาย Volume ต้องตรวจขนาด Block Device และขยาย Partition หรือ Filesystem ภายใน Guest ตามที่ใช้ การเพิ่มขนาดใน Cinder เป็นเพียงขั้นแรก
 
----
+## Workshop ท้ายบท — ย้าย Data Volume จาก VM-A ไป VM-B
 
-## Volume Types
+**ระบบ** DevStack OpenStack Hibiscus (2026.2) · **เวลา** 50–65 นาที · **รูปแบบ** กลุ่มละ 2–3 คน
 
-**Volume Type** คือ Template ที่ผูกกับ Backend และคุณสมบัติ:
+### สิ่งที่ผู้สอนเตรียม
+
+- Project ที่มีสิทธิ์ใช้ Cinder และโควตาสำหรับ Volume 1 GiB ตรวจ `openstack volume list` ล่วงหน้า และทดลองสร้าง Volume จนเป็น `available`
+- VM-A และ VM-B ใน Project เดียวกัน ใช้ Image Linux ที่มี `lsblk`, `mkfs.ext4`, `mount` และ `sha256sum` พร้อมสิทธิ์ `sudo` ภายใน Guest ใช้ Console ได้โดยไม่ต้องตั้ง Floating IP
+- ตรวจล่วงหน้าว่า Volume สามารถแนบกับ VM ทั้งสองได้ตาม Availability Zone และการตั้งค่าของ Lab
+
+### ขั้นที่ 1 — สร้างและ Attach (15–20 นาที)
+
+บันทึกผล `lsblk -f` ใน VM-A ก่อนแนบดิสก์ จาก OpenStack CLI สร้าง Volume ใหม่โดยแทน `XX` ด้วยเลขกลุ่ม
 
 ```bash
-# แสดงรายการ Volume Types
-openstack volume type list
-
-# สร้าง Volume Type
-openstack volume type create --description "SSD Fast Tier" ssd-fast
-
-# ตั้งค่า Extra Specs (QoS)
-cinder type-key ssd-fast set volume_backend_name=LVM-SSD
+openstack volume create --size 1 lec07-teamXX-data
 ```
 
-| คุณสมบัติ | คำอธิบาย |
-|----------|---------|
-| `volume_backend_name` | ชื่อ Backend ที่จะใช้ |
-| `provisioned_iops` | IOPS ที่รับประกัน |
-| `multiattach` | รองรับการ Attach หลาย VM |
-
----
-
-## การจัดการ Volumes
+คัดลอก UUID ของ Volume และของ VM ทั้งสอง แล้วตั้งค่าตัวแปรใน Bash ที่ใช้ OpenStack CLI
 
 ```bash
-# สร้าง Volume
-openstack volume create --size 10 --type ssd-fast my-volume
+VOLUME_ID='แทนด้วย Volume UUID'
+VM_A='แทนด้วย VM-A UUID'
+VM_B='แทนด้วย VM-B UUID'
 
-# แสดงรายการ Volumes
-openstack volume list
-
-# ดูรายละเอียด Volume
-openstack volume show my-volume
-
-# Extend (ขยายขนาด)
-openstack volume set --size 20 my-volume
-
-# ลบ Volume
-openstack volume delete my-volume
+openstack volume show "$VOLUME_ID" -c status -c attachments
+openstack server add volume "$VM_A" "$VOLUME_ID"
 ```
 
----
+รันคำสั่ง Attach หลัง Volume เป็น `available` จากนั้นตรวจ `volume show` ซ้ำจนเป็น `in-use` และ Attachment ชี้ไปที่ VM-A
 
-## Attach / Detach Volume
+### ขั้นที่ 2 — เขียนข้อมูลแล้ว Detach (15–20 นาที)
 
-```
-┌─────────────────────────────────────────┐
-│         Compute Node                     │
-│  ┌─────────┐      ┌────────────────┐   │
-│  │   VM    │ ←──→ │ /dev/vdb (VirtIO)│  │
-│  │ (Nova)  │      │ Cinder Volume   │   │
-│  └─────────┘      └────────────────┘   │
-└─────────────────────────────────────────┘
-```
+ใน Console ของ **VM-A** เทียบผล `lsblk -f` ก่อนกับหลัง Attach ให้ผู้สอนช่วยยืนยันว่าอุปกรณ์ที่เพิ่มมาคือ **Volume ใหม่ที่ว่าง** ตรวจจากขนาดและรายการอุปกรณ์ที่เพิ่มขึ้น จากนั้นจึงแทน Path ด้านล่างด้วยอุปกรณ์จริง ชื่ออุปกรณ์อาจต่างกันในแต่ละ VM ให้รันทีละบรรทัดและหยุดหาก Format หรือ Mount ไม่สำเร็จ
 
 ```bash
-# ผูก Volume กับ VM
-openstack server volume attach my-instance my-volume
-
-# ภายใน VM — ตรวจสอบดิสก์ใหม่
-lsblk
-sudo fdisk -l
-
-# สร้าง Filesystem บน Volume
-sudo mkfs.ext4 /dev/vdb
-sudo mkdir /mnt/data
-sudo mount /dev/vdb /mnt/data
-
-# ถอด Volume (ต้อง Unmount ก่อน)
-sudo umount /mnt/data
-openstack server volume detach my-instance my-volume
+DEVICE='/dev/REPLACE_WITH_VERIFIED_NEW_DISK'
+sudo mkfs.ext4 "$DEVICE"
+sudo mkdir -p /mnt/cinder-lab
+sudo mount "$DEVICE" /mnt/cinder-lab
+printf '%s\n' 'lec07-teamXX' | sudo tee /mnt/cinder-lab/proof.txt
+sha256sum /mnt/cinder-lab/proof.txt
+sudo umount /mnt/cinder-lab
 ```
 
----
+จด SHA-256 แล้วกลับไปที่ OpenStack CLI เมื่อ Unmount สำเร็จจึงสั่ง `openstack server remove volume "$VM_A" "$VOLUME_ID"` และรอจน Volume กลับเป็น `available`
 
-## Snapshots
+### ขั้นที่ 3 — Attach ที่ VM-B และพิสูจน์ว่าข้อมูลยังอยู่ (15 นาที)
 
-Snapshot บันทึกสถานะ Volume ณ เวลาหนึ่ง:
+จดผล `lsblk -f` ใน VM-B ก่อน Attach แล้วสั่ง `openstack server add volume "$VM_B" "$VOLUME_ID"` จาก OpenStack CLI ตรวจว่า Attachment ชี้ไปที่ VM-B จากนั้นตรวจอุปกรณ์ที่เพิ่มใน Guest แล้ว Mount แบบอ่านอย่างเดียว โดยใช้ Filesystem เดิม หาก Mount ไม่สำเร็จ ให้หยุดก่อนอ่านไฟล์
 
 ```bash
-# สร้าง Snapshot
-openstack snapshot create --volume my-volume my-snapshot
-
-# แสดงรายการ Snapshots
-openstack snapshot list
-
-# สร้าง Volume ใหม่จาก Snapshot
-openstack volume create --snapshot my-snapshot --size 10 restored-volume
-
-# ลบ Snapshot
-openstack snapshot delete my-snapshot
+DEVICE='/dev/REPLACE_WITH_VERIFIED_ATTACHED_DISK'
+sudo mkdir -p /mnt/cinder-lab
+sudo mount -o ro "$DEVICE" /mnt/cinder-lab
+cat /mnt/cinder-lab/proof.txt
+sha256sum /mnt/cinder-lab/proof.txt
+sudo umount /mnt/cinder-lab
 ```
 
-!!! warning "อย่าสับสน"
-    **Volume Snapshot** (Cinder) ≠ **VM Snapshot** (Nova Image)  
-    Volume Snapshot = สำรองดิสก์อย่างเดียว  
-    VM Snapshot = สำรองดิสก์ + สถานะ VM (RAM, CPU)
+### งานส่งและคืนทรัพยากร (5–10 นาที)
 
----
+ส่ง Volume UUID, Instance UUID ของทั้งสอง VM, สถานะและ Attachment ในแต่ละช่วง พร้อม SHA-256 จากทั้งสองเครื่อง อธิบายว่า **เหตุใด Volume UUID และข้อมูลจึงเหมือนเดิม แม้ย้ายไปยัง Instance คนละตัว**
 
-## Backups
-
-Backup คือการสำรอง Volume ไปยัง Object Store (Swift):
-
-```bash
-# สร้าง Backup
-openstack volume backup create --volume my-volume my-backup
-
-# แสดงรายการ Backups
-openstack volume backup list
-
-# Restore จาก Backup
-openstack volume backup restore my-backup new-volume
-```
-
-| คุณสมบัติ | Snapshot | Backup |
-|----------|---------|--------|
-| ที่เก็บ | บน Backend เดียวกัน | Object Store (offsite) |
-| ใช้เวลา | เร็ว (CoW) | ช้ากว่า |
-| ความปลอดภัย | ถ้า Backend พัง = หาย | กระจายความเสี่ยง |
-
----
-
-## Boot from Volume
-
-สร้าง VM โดยใช้ Volume เป็นดิสก์เริ่มต้นแทน Image:
-
-```bash
-# สร้าง Bootable Volume จาก Image
-openstack volume create --image cirros --size 5 --bootable vol-cirros
-
-# Boot VM จาก Volume
-openstack server create \
-  --flavor m1.tiny \
-  --volume vol-cirros \
-  --network private-net \
-  --key-name my-key \
-  vm-from-volume
-```
-
-!!! tip "ข้อดีของ Boot from Volume"
-    - VM ย้ายได้ระหว่าง Host (Live Migration)
-    - ดิสก์อยู่บน Shared Storage (Ceph, NFS)
-    - ง่ายต่อการสำรองและ Restore
-
----
+เมื่อ Unmount สำเร็จ ให้ Detach จาก VM-B รอจนเป็น `available` แล้วลบ Volume ที่กลุ่มสร้าง หากสถานะค้างหรือขึ้น `error` ให้บันทึกผลและให้ผู้สอนตรวจ Attachment หรือ Backend ก่อนดำเนินการต่อ
 
 ## สไลด์การบรรยาย
 
@@ -208,5 +108,6 @@ openstack server create \
 
 ## แหล่งข้อมูลเพิ่มเติม
 
-- [Cinder Documentation](https://docs.openstack.org/cinder/latest/)
-- [Cinder Admin Guide](https://docs.openstack.org/cinder/latest/admin/)
+- [Cinder System Architecture](https://docs.openstack.org/cinder/latest/contributor/architecture.html)
+- [Cinder 2026.2 — Backup Drivers](https://docs.openstack.org/cinder/2026.2/configuration/block-storage/backup-drivers.html)
+- [OpenStack CLI — Server Commands](https://docs.openstack.org/python-openstackclient/2025.1/cli/command-objects/server.html)

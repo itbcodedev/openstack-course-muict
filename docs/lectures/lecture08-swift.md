@@ -2,178 +2,78 @@
 
 ## วัตถุประสงค์การเรียนรู้
 
-- เข้าใจความแตกต่างระหว่าง Block, File และ Object Storage
-- รู้จักสถาปัตยกรรม Ring และ Data Distribution ของ Swift
-- อธิบายการ Replicate และ Consistency ใน Object Store
-- ใช้งาน Swift CLI และ API เบื้องต้น
+- เลือกใช้ Block, File หรือ Object Storage ตามรูปแบบการเข้าถึงข้อมูล
+- อธิบาย Account, Container, Object, Proxy และ Ring
+- อัปโหลด ดาวน์โหลด และตรวจสอบข้อมูลกับ Metadata บน DevStack Hibiscus (2026.2)
 
----
+## Swift ทำอะไร?
 
-## Swift คืออะไร?
+ใน [Lecture 07](lecture07-cinder.md) เราแนบดิสก์ Cinder เข้า VM เพื่อใช้ Filesystem ในบทนี้เราจะใช้ **Swift** เก็บไฟล์ผ่าน HTTP API โดยอ้างถึงชื่อ Object ภายใน Container แอปสามารถอัปโหลดหรือดาวน์โหลดได้โดยใช้สิทธิ์ของตน
 
-**Swift** เป็นบริการ Object Storage ของ OpenStack:
+| ประเภท | แอปเข้าถึงอย่างไร | ตัวอย่าง |
+|---|---|---|
+| **Block** | เข้าถึงอุปกรณ์แบบดิสก์ โดย Guest จัดการ Filesystem ได้ | ดิสก์ VM หรือดิสก์ฐานข้อมูล |
+| **File** | ใช้ไฟล์และไดเรกทอรีบน Filesystem ที่แชร์ผ่านเครือข่าย | พื้นที่แชร์งานผ่าน NFS |
+| **Object** | ส่งคำขอผ่าน API โดยระบุ Container และชื่อ Object | ไฟล์ภาพ รายงาน และข้อมูลเก็บถาวร |
 
-- **Scalable** — ขยายได้โดยเพิ่ม Node ใหม่ (Scale-out)
-- **Highly Available** — ข้อมูล Replicate อัตโนมัติ
-- **Durable** — รองรับ Hardware Failure โดยไม่สูญหาย
-- **No Single Point of Failure** — ทุกส่วนเป็น Redundant
-- **REST API** — HTTP-based (S3-compatible)
+### Account, Container และ Object
 
-!!! info "Object Storage ≠ Block Storage"
-    | Object Storage | Block Storage |
-    |----------------|---------------|
-    | เก็บ Object (ไฟล์ + Metadata) | เก็บ Block (raw disk) |
-    | Flat namespace (ไม่มี folder ซ้อน) | Filesystem hierarchy |
-    | HTTP API | iSCSI/FC/NFS |
-    | ขยายได้ไม่จำกัด | จำกัดตามขนาดดิสก์ |
-    | Best for: Backups, Archives, Media | Best for: Databases, VMs |
+- **Account** คือขอบเขตระดับบนสุด ใน DevStack ที่ใช้ Keystone มักสัมพันธ์กับ Project
+- **Container** คือกลุ่มของ Objects ภายใน Account
+- **Object** คือข้อมูลพร้อม Metadata เช่น `reports/day-01.txt` ภายใน Container ชื่อ `lab-results` เครื่องหมาย `/` เป็นส่วนหนึ่งของชื่อที่เครื่องมืออาจแสดงเป็นโฟลเดอร์เสมือน
 
----
+Swift มี **Swift API** ของตนเอง การรองรับคำขอแบบ S3 ขึ้นกับการเปิดใช้และตั้งค่า Middleware กิจกรรมนี้ใช้ Swift CLI กับ Swift API
 
-## สถาปัตยกรรม Swift
+## เบื้องหลังการอัปโหลด
 
-```
-┌─────────────────────────────────────────┐
-│         Proxy Node (Load Balancer)      │
-│         swift-proxy-server               │
-│         nginx / haproxy                  │
-└──────────────────┬──────────────────────┘
-                   │
-┌──────────────────▼──────────────────────┐
-│         Storage Node 1                   │
-│  ┌────────┐ ┌────────┐ ┌────────┐       │
-│  │ Account │ │Container│ │ Object │       │
-│  │ Server  │ │ Server  │ │ Server │       │
-│  └────────┘ └────────┘ └────────┘       │
-│  ┌────────┐ ┌────────┐                  │
-│  │ Account │ │Container│                  │
-│  │  Ring   │ │  Ring   │                  │
-│  └────────┘ └────────┘                  │
-│  ┌─────────────────────────┐             │
-│  │       Object Ring        │             │
-│  └─────────────────────────┘             │
-└─────────────────────────────────────────┘
-```
+1. **Proxy Server** รับคำขอ ตรวจสิทธิ์ผ่านกลไก Authentication/Authorization ที่ตั้งไว้ แล้วใช้ Ring หาตำแหน่งสำหรับคำขอ
+2. **Ring** จับคู่ชื่อในขอบเขต Account, Container หรือ Object กับ Partition และอุปกรณ์จัดเก็บ มี Account Ring, Container Ring และ Object Ring ตาม Storage Policy
+3. **Storage Servers** ทำงานตามประเภทข้อมูล Account Server ดูแลรายการ Containers, Container Server ดูแลรายการ Objects และ Object Server จัดเก็บเนื้อหากับ Metadata ของ Object
 
-### ส่วนประกอบ
+ระบบอาจใช้ **Replication** เพื่อเก็บหลายสำเนา หรือใช้ **Erasure Coding** เพื่อแบ่งข้อมูลเป็นชิ้นที่ใช้กู้คืนได้ตาม Storage Policy ความทนทานขึ้นกับการกระจายข้อมูลและการติดตั้งจริง งานเบื้องหลังช่วยซ่อมและกระจายการเปลี่ยนแปลง รายการใน Container จึงอาจอัปเดตช้ากว่าการเข้าถึง Object โดยตรงในบางกรณี ส่วนการลบตามเวลาที่ตั้งไว้เป็นหน้าที่ของ **Object Expirer**
 
-| ส่วนประกอบ | หน้าที่ |
-|-----------|------|
-| **Proxy Server** | รับ API requests, หาตำแหน่งข้อมูลผ่าน Ring, ส่งต่อไป Storage Nodes |
-| **Account Server** | เก็บรายการ Containers ใน Account |
-| **Container Server** | เก็บรายการ Objects ใน Container |
-| **Object Server** | เก็บ Object Data จริง |
-| **Ring** | ตาราง Hash ที่กระจายข้อมูลไปยัง Nodes |
+DevStack แบบเครื่องเดียวเหมาะกับการเรียนรู้ API การอัปโหลดและดาวน์โหลดสำเร็จยืนยันการเข้าถึงข้อมูลใน Lab ได้ ส่วนการทนต่อโฮสต์เสียต้องทดสอบแยกบนระบบที่มีการกระจาย Storage จริง
 
----
+## Workshop ท้ายบท — ตรวจข้อมูลและ Metadata หลังดาวน์โหลด
 
-## The Ring — หัวใจของ Swift
+**ระบบ** DevStack OpenStack Hibiscus (2026.2) · **เวลา** 40–55 นาที · **รูปแบบ** กลุ่มละ 2–3 คน
 
-**Ring** คือ Data Structure ที่กระจาย Objects ไปยัง Nodes:
+### สิ่งที่ผู้สอนเตรียม
 
-```
-Object Name → MD5 Hash → Partition → Replica → Storage Node
-```
+- เปิด Swift และเตรียม Swift CLI (`python-swiftclient`) พร้อม Credentials ของ Project ทดสอบ ตรวจว่า `openstack catalog list` มีบริการประเภท `object-store` และ `swift stat` สำเร็จด้วยบัญชีผู้เรียน
+- หากไม่มี Endpoint ให้ตรวจว่า DevStack เปิด Swift ตาม [Lab 1](../labs/lab01-devstack.md) และคู่มือ DevStack หาก Endpoint มีแต่เข้าไม่ได้ ให้ตรวจ Project, สิทธิ์ และการเข้าถึง Proxy ก่อนเริ่ม Workshop
 
-### ประเภท Ring
+### ขั้นที่ 1 — สร้าง Container และอัปโหลด (15–20 นาที)
 
-| Ring | เก็บ |
-|------|------|
-| **Account Ring** | ตำแหน่งของ Account Databases |
-| **Container Ring** | ตำแหน่งของ Container Databases |
-| **Object Ring** | ตำแหน่งของ Object Data |
-
-### ค่าสำคัญ
-
-| พารามิเตอร์ | คำอธิบาย |
-|-----------|------|
-| **Partitions** | จำนวนส่วนที่แบ่งข้อมูล (ค่าเริ่มต้น 2^18 = 262,144) |
-| **Replicas** | จำนวนสำเนาของข้อมูล (ค่าเริ่มต้น 3) |
-| **Devices** | ดิสก์/Partitions บน Storage Nodes |
-| **Weight** | น้ำหนักสำหรับกระจายข้อมูล |
-
----
-
-## Account, Container, Object
-
-```
-Account (เช่น AUTH_project-id)
-└── Container (เช่น images, backups, logs)
-    └── Object (เช่น photo.jpg)
-        └── Metadata + Data
-```
-
-| ระดับ | คำอธิบาย |
-|-------|---------|
-| **Account** | คอนเทนเนอร์ระดับสูงสุด สอดคล้องกับ Project |
-| **Container** | กลุ่มของ Objects (เหมือน Bucket ใน S3) |
-| **Object** | ไฟล์ + Metadata แท้จริง |
-
----
-
-## การใช้งาน Swift
+ใช้ Bash ในไดเรกทอรีทดลองที่ยังไม่มีไฟล์ชื่อนี้ แทน `XX` ด้วยเลขกลุ่ม
 
 ```bash
-# ตรวจสอบว่า Swift พร้อมใช้งาน
-swift stat
+CONTAINER='lec08-teamXX-objects'
+OBJECT='lec08-source.txt'
 
-# แสดงรายการ Containers
-swift list
+printf '%s\n' 'MUICT Swift workshop — team XX' > "$OBJECT"
+sha256sum "$OBJECT"
 
-# สร้าง Container
-swift post my-container
-
-# อัปโหลดไฟล์
-swift upload my-container report.pdf
-
-# อัปโหลดทั้ง Directory
-swift upload my-container -S 1073741824 /path/to/backups
-
-# ดาวน์โหลดไฟล์
-swift download my-container report.pdf
-
-# แสดงรายการ Objects ใน Container
-swift list my-container
-
-# ลบ Object
-swift delete my-container report.pdf
-
-# ลบ Container ทั้งหมด
-swift delete my-container
+swift post "$CONTAINER"
+swift upload "$CONTAINER" "$OBJECT"
+swift list "$CONTAINER"
 ```
 
----
-
-## Metadata และ Headers
+### ขั้นที่ 2 — เพิ่ม Metadata แล้วดาวน์โหลด (15–20 นาที)
 
 ```bash
-# ตั้งค่า Metadata บน Container
-swift post -m "X-Container-Meta-Project:webapp" my-container
-
-# ตั้งค่า Metadata บน Object
-swift post -m "X-Object-Meta-Author:alice" my-container report.pdf
-
-# ตั้งค่า ACL (Read Access)
-swift post -r ".r:*" my-container  # อนุญาตให้อ่านได้ทั้งหมด
-
-# ตั้งค่า Expiration
-swift upload -H "X-Delete-After:86400" my-container temp.log
-# ไฟล์จะถูกลบอัตโนมัติหลัง 1 วัน
+swift post -m 'lesson:lecture08' "$CONTAINER" "$OBJECT"
+swift stat "$CONTAINER" "$OBJECT"
+swift download -o lec08-downloaded.txt "$CONTAINER" "$OBJECT"
+sha256sum "$OBJECT" lec08-downloaded.txt
 ```
 
----
+บันทึกชื่อ Object, ขนาด และ Metadata ที่เห็นจาก `swift stat` แล้วเปรียบเทียบ SHA-256 ของทั้งสองไฟล์ ค่าเท่ากันเป็นหลักฐานว่าเนื้อหาที่ดาวน์โหลดตรงกับไฟล์ต้นฉบับ การเปลี่ยน Metadata จึงตรวจแยกจากการเปลี่ยนเนื้อหาได้ หากรายการ Object ยังไม่ปรากฏหลังอัปโหลด ให้ตรวจผลจาก `swift stat` ด้วยชื่อ Object โดยตรงและจดสิ่งที่พบ
 
-## Consistency และ Durability
+### งานส่งและคืนทรัพยากร (10–15 นาที)
 
-| กลไก | คำอธิบาย |
-|------|------|
-| **Replication** | เก็บ 3 สำเนาของทุก Object บน Nodes ต่างกัน |
-| **Quorum Read** | อ่านจาก Replica หลายตัว ยืนยันความถูกต้อง |
-| **Auditor** | ตรวจสอบความสมบูรณ์ของข้อมูลเป็นระยะ |
-| **Updater** | ซิงค์ Container/Account listings เมื่อ async |
-| **Reaper** | จัดการ Object Expiration |
-
----
+- ส่งชื่อ Container, ชื่อ Object, Metadata ที่เพิ่ม และค่า SHA-256 ทั้งสองค่า อธิบายว่า **ค่า Hash ที่ตรงกันยืนยันอะไร และใช้ยืนยันจำนวนสำเนาบน Storage Nodes ได้หรือไม่**
+- ลบ Object ทดสอบด้วย `swift delete "$CONTAINER" "$OBJECT"` แล้วใช้ `swift list "$CONTAINER"` ตรวจว่าไม่มี Object เหลือ จากนั้นลบ Container ว่างของกลุ่มด้วย `openstack container delete "$CONTAINER"` ตรวจชื่อก่อนลบ
 
 ## สไลด์การบรรยาย
 
@@ -181,6 +81,7 @@ swift upload -H "X-Delete-After:86400" my-container temp.log
 
 ## แหล่งข้อมูลเพิ่มเติม
 
-- [Swift Documentation](https://docs.openstack.org/swift/latest/)
-- [Swift Admin Guide](https://docs.openstack.org/swift/latest/admin/)
-- [S3 API Compatibility](https://docs.openstack.org/swift/latest/s3_compat.html)
+- [Swift 2026.2 Administrator Guide](https://docs.openstack.org/swift/2026.2/admin/index.html)
+- [Swift Architectural Overview](https://docs.openstack.org/swift/latest/overview_architecture.html)
+- [DevStack Configuration — Swift](https://docs.openstack.org/devstack/latest/configuration.html#swift)
+- [Swift CLI](https://docs.openstack.org/python-swiftclient/latest/cli/index.html)
