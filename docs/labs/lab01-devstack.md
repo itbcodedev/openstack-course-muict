@@ -44,6 +44,11 @@ Get-VMNetworkAdapter -VMName "DevStackCentos9Stream" | Select-Object Name, MacAd
 
 # 7. เปิดเครื่องเสมือนกลับมา
 Start-VM -Name "DevStackCentos9Stream"
+
+# 8 ทดสอบ vmx  สำหรับ intel,  svm สำหรับ AMD และ kvm
+grep -E 'vmx|svm' /proc/cpuinfo
+lscpu | grep -i virtualization
+lsmod | grep kvm
 ```
 
 ![](./images/lab01-2.png)
@@ -75,7 +80,7 @@ sudo -u stack -i
 
 ![](./images/lab01-5.png)
 
-หรือหาก VM ยังไม่ได้สร้างผู้ใช้ stack: (lab ข้ามข้อนี้)
+หรือหาก VM ยังไม่ได้สร้างผู้ใช้ stack: (lab ข้ามข้อนี้) เช่นในกรณีที่ linux server มี user ชื่อ stack
 
 ```bash
 sudo useradd -s /bin/bash -d /opt/stack -m stack
@@ -97,7 +102,11 @@ git clone https://opendev.org/openstack/devstack
 
 cd devstack
 git branch -a
+
+# checkout code branch stable
 git checkout stable/2026.2
+
+# ยืนยันว่าว่าอยู่บน Branch stable/2026.2 จริง
 git branch
 ```
 ![](./images/lab01-7.png)
@@ -106,7 +115,7 @@ git branch
 
 ![](./images/lab01-8.png)
 
-## upgrade pyton เป็น 3.11
+## upgrade pyton เป็น 3.11 centos 9 stream
 
 ```
 # 1. ติดตั้ง Python 3.11 และ pip
