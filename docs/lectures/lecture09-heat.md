@@ -2,305 +2,132 @@
 
 ## วัตถุประสงค์การเรียนรู้
 
-- เข้าใจแนวคิด Infrastructure as Code (IaC) ใน OpenStack
-- เขียน Heat Templates (HOT) ด้วย YAML
-- สร้าง Stack ที่ประกอบด้วย VM, Network, Volume, Floating IP
-- จัดการ Stack Lifecycle: Create, Update, Delete
+- อธิบายความต่างระหว่าง Template, Stack และ Resource
+- เขียน Heat Orchestration Template (HOT) ที่ให้ VM ใช้ Port บน Network ที่มีอยู่
+- สร้าง อัปเดต และลบ Stack แล้วตรวจผลด้วย Heat, Nova และ Neutron
 
----
+## Heat ทำอะไร?
 
-## Heat คืออะไร?
+ใน [บท Nova](lecture04-nova.md) และ [บท Neutron](lecture05-neutron.md) เราสร้าง VM และตรวจพอร์ตทีละขั้น เมื่ออยากสร้างชุดทรัพยากรแบบเดิมซ้ำ ให้เก็บคำอธิบายไว้ใน **Template** แล้วส่งให้ **Heat** ประสานงานกับบริการที่เกี่ยวข้อง แนวทางนี้เรียกว่า **Infrastructure as Code (IaC)** เพราะเราเก็บโครงสร้างไว้ในไฟล์ที่อ่าน ทบทวน และติดตามการเปลี่ยนแปลงได้
 
-**Heat** เป็นบริการ Orchestration ของ OpenStack:
+| คำศัพท์ | ตัวอย่างในบทนี้ |
+|---|---|
+| **Template** | ไฟล์ YAML ที่ระบุว่าต้องการ Port หนึ่งรายการและ VM หนึ่งเครื่อง |
+| **Stack** | การนำ Template ไปใช้จริงหนึ่งครั้ง เช่น Stack ของกลุ่ม 01 |
+| **Resource** | รายการที่ Stack จัดการ เช่น Port ของ Neutron หรือ Instance ของ Nova |
+| **Dependency** | ความสัมพันธ์ที่กำหนดลำดับ เช่น VM ต้องรอให้ Port พร้อมก่อน |
+| **Output** | ค่าที่ Template ส่งออก เช่น UUID ของ VM และ Port |
 
-- **Template-based** — นิยาม Infrastructure ด้วยไฟล์ YAML/JSON
-- **Declarative** — บอกว่าต้องการอะไร ไม่ใช่วิธีทำ
-- **Reproducible** — Deploy ซ้ำได้ด้วย Template เดียวกัน
-- **Resource Management** — สร้าง VM, Network, Volume, Router, Security Groups พร้อมกัน
-- **Auto-scaling** — ขยาย VM ตามเงื่อนไข (เช่น CPU > 80%)
+**Heat API** รับคำขอจัดการ Stack ส่วน **Heat Engine** อ่าน Template หาความสัมพันธ์ระหว่าง Resources แล้วเรียก API ของบริการต่าง ๆ พร้อมบันทึกสถานะและ Events ให้ตรวจย้อนหลัง ในตัวอย่างนี้ Heat สร้าง Port ผ่าน Neutron จากนั้นส่ง UUID ของ Port ให้ Nova ใช้ตอนสร้าง VM ส่วน Network, Image และ Flavor เป็นทรัพยากรเดิมที่ส่งเข้ามาเป็นพารามิเตอร์
 
----
+## อ่านไฟล์ HOT ให้เป็น
 
-## สถาปัตยกรรม Heat
+| ส่วน | หน้าที่ |
+|---|---|
+| `heat_template_version` | ระบุรุ่นของไวยากรณ์ HOT รุ่นนี้เป็นคนละค่ากับ OpenStack Release เช่น Hibiscus (2026.2) |
+| `parameters` | รับค่าเมื่อสร้างหรืออัปเดต Stack เช่น Image UUID |
+| `resources` | กำหนดชนิดและคุณสมบัติของทรัพยากรที่ Heat จัดการ |
+| `outputs` | ส่งข้อมูลที่ผู้ใช้ต้องการตรวจหลังสร้าง Stack |
 
-```
-┌─────────────────────────────────────────┐
-│         heat-api                        │
-│   (รับ REST API / Validate Template)   │
-└──────────────────┬──────────────────────┘
-                   │
-┌──────────────────▼──────────────────────┐
-│         heat-engine                       │
-│   - Parse Template                        │
-│   - เรียก APIs ของ Nova, Neutron, Cinder │
-│   - ติดตามสถานะ Resources                 │
-│   - จัดการ Stack Lifecycle                │
-└─────────────────────────────────────────┘
-```
+`get_param` อ่านค่าจากพารามิเตอร์ และ `get_resource` อ้างถึง ID ของ Resource ใน Template การใช้ `get_resource` จาก VM ไปยัง Port ทำให้ Heat รู้ว่าต้องสร้าง Port ก่อน หากต้องการอ่านคุณสมบัติเฉพาะของ Resource ใช้ `get_attr` กับ Attribute ที่ชนิด Resource นั้นรองรับ
 
----
+### การอัปเดตและการขยายระบบ
 
-## Heat Orchestration Template (HOT)
+การอัปเดตบางคุณสมบัติ เช่น `metadata` ของ `OS::Nova::Server` ทำได้กับ VM เดิม ส่วนคุณสมบัติอื่นอาจทำให้ Heat สร้าง Resource มาทดแทน ให้ตรวจเอกสารของแต่ละ Property ก่อนอัปเดต Stack ที่มีข้อมูลสำคัญ การลบ Stack จะลบทรัพยากรที่ Stack จัดการตามนโยบายการลบของแต่ละ Resource
 
-HOT ใช้ YAML นิยาม Stack:
+สำหรับ Auto Scaling, Heat สามารถจัดการกลุ่ม Instance และ Scaling Policy ได้ หากต้องการขยายตาม Metric ต้องมีแหล่ง Metric และระบบ Alarm ที่ตั้งค่าไว้ เช่น Gnocchi และ Aodh กิจกรรมหลักใช้การอัปเดต Stack แบบสั่งเอง จึงทำได้โดยไม่ต้องเตรียม Telemetry
 
-```yaml
-heat_template_version: '2021-04-16'
+## Workshop ท้ายบท — สร้าง อัปเดต และลบ VM ด้วย HOT
 
-description: Deploy a simple web server
+**ระบบ** DevStack OpenStack Hibiscus (2026.2) · **เวลา** 45–60 นาที · **รูปแบบ** กลุ่มละ 2–3 คน
 
-parameters:
-  image:
-    type: string
-    default: cirros
-    description: Image to use
-  flavor:
-    type: string
-    default: m1.small
-  key_name:
-    type: string
-    description: SSH keypair name
+### สิ่งที่ผู้สอนเตรียม
 
-resources:
-  web_server:
-    type: OS::Nova::Server
-    properties:
-      image: { get_param: image }
-      flavor: { get_param: flavor }
-      key_name: { get_param: key_name }
-      networks:
-        - network: private-net
+- ตรวจว่า Project ของนักศึกษาใช้ Heat ได้ โดย `openstack catalog list` แสดงบริการประเภท `orchestration` และ `openstack stack list` สำเร็จ
+- หาก CLI ไม่รู้จักคำสั่ง `stack` ให้ตรวจปลั๊กอิน `python-heatclient` ใน Python Environment เดียวกับ OpenStack CLI หากไม่มีบริการ `orchestration` ให้ตรวจการเปิด Heat ตาม [Lab 1](../labs/lab01-devstack.md) และคู่มือ Heat สำหรับ DevStack
+- เตรียม Image ที่บูตได้, Flavor ที่อยู่ในโควตา และ Network ที่มี IPv4 Subnet พร้อม IP ว่างสำหรับสร้าง Port ให้ผู้เรียนใช้ Project เดียวกันใน CLI และ Horizon
 
-outputs:
-  server_ip:
-    description: IP address of the web server
-    value: { get_attr: [web_server, first_address] }
-```
+### ขั้นที่ 1 — เตรียม Template และพารามิเตอร์ (10–15 นาที)
 
----
-
-## โครงสร้าง HOT
-
-| ส่วน | คำอธิบาย |
-|------|---------|
-| `heat_template_version` | ระบุเวอร์ชันของ Template |
-| `description` | คำอธิบาย Stack |
-| `parameters` | ค่าที่ผู้ใช้กรอกได้ตอน Deploy |
-| `resources` | Resources ที่ต้องสร้าง |
-| `outputs` | ค่าที่ส่งกลับหลัง Deploy |
-
----
-
-## ตัวอย่าง: 3-Tier Web Application
+บันทึกเป็นไฟล์ **`lec09-stack.yaml`**
 
 ```yaml
 heat_template_version: '2021-04-16'
-description: 3-Tier Application (Web + App + DB)
+description: Create one Neutron port and one Nova instance.
 
 parameters:
-  key_name:
+  image_id:
     type: string
-  image:
+  flavor_id:
     type: string
-    default: ubuntu-22.04
-  flavor_web:
+  network_id:
     type: string
-    default: m1.small
-  flavor_db:
+  lab_stage:
     type: string
-    default: m1.medium
+    default: initial
 
 resources:
-  # === Network ===
-  app_network:
-    type: OS::Neutron::Net
+  lab_port:
+    type: OS::Neutron::Port
     properties:
-      name: app-network
+      network: { get_param: network_id }
 
-  app_subnet:
-    type: OS::Neutron::Subnet
-    properties:
-      network: { get_resource: app_network }
-      cidr: 10.0.1.0/24
-      gateway: 10.0.1.1
-
-  app_router:
-    type: OS::Neutron::Router
-    properties:
-      external_gateway_info:
-        network: public-net
-
-  router_interface:
-    type: OS::Neutron::RouterInterface
-    properties:
-      router: { get_resource: app_router }
-      subnet: { get_resource: app_subnet }
-
-  # === Security Group ===
-  web_secgroup:
-    type: OS::Neutron::SecurityGroup
-    properties:
-      name: web-sg
-      rules:
-        - protocol: tcp
-          port_range_min: 80
-          port_range_max: 80
-          remote_ip_prefix: 0.0.0.0/0
-        - protocol: tcp
-          port_range_min: 22
-          port_range_max: 22
-          remote_ip_prefix: 0.0.0.0/0
-
-  # === Web Server ===
-  web_server:
+  lab_vm:
     type: OS::Nova::Server
     properties:
-      image: { get_param: image }
-      flavor: { get_param: flavor_web }
-      key_name: { get_param: key_name }
+      image: { get_param: image_id }
+      flavor: { get_param: flavor_id }
       networks:
-        - network: { get_resource: app_network }
-      security_groups:
-        - { get_resource: web_secgroup }
-      user_data_format: RAW
-      user_data: |
-        #!/bin/bash
-        apt-get update
-        apt-get install -y nginx
-        systemctl enable nginx
-
-  # === Database Server ===
-  db_volume:
-    type: OS::Cinder::Volume
-    properties:
-      size: 50
-
-  db_server:
-    type: OS::Nova::Server
-    properties:
-      image: { get_param: image }
-      flavor: { get_param: flavor_db }
-      key_name: { get_param: key_name }
-      networks:
-        - network: { get_resource: app_network }
-      block_device_mapping_v2:
-        - image: { get_param: image }
-          delete_on_termination: false
-          boot_index: 0
-        - volume_id: { get_resource: db_volume }
-          delete_on_termination: false
-          boot_index: -1
-
-  # === Floating IP for Web ===
-  web_floating_ip:
-    type: OS::Neutron::FloatingIP
-    properties:
-      floating_network: public-net
-
-  web_floating_ip_assoc:
-    type: OS::Neutron::FloatingIPAssociation
-    properties:
-      floatingip_id: { get_resource: web_floating_ip }
-      port_id: { get_attr: [web_server, addresses, app_network, 0, port] }
+        - port: { get_resource: lab_port }
+      metadata:
+        lab_stage: { get_param: lab_stage }
 
 outputs:
-  web_url:
-    value: { get_attr: [web_floating_ip, floating_ip_address] }
-    description: Web Server IP
+  vm_id:
+    value: { get_resource: lab_vm }
+  port_id:
+    value: { get_resource: lab_port }
 ```
 
----
-
-## Intrinsic Functions
-
-| Function | คำอธิบาย |
-|----------|---------|
-| `get_param` | อ่านค่าจาก Parameter |
-| `get_resource` | อ้างอิง Resource อื่น |
-| `get_attr` | อ่าน Attribute ของ Resource |
-| `list_join` | รวม String ด้วยตัวคั่น |
-| `str_replace` | แทนที่ String ใน Template |
-| `if` / `equals` | เงื่อนไข |
-
-```yaml
-user_data:
-  str_replace:
-    template: |
-      #!/bin/bash
-      echo "DB_HOST: _DB_HOST_" >> /etc/app.conf
-    params:
-      _DB_HOST_: { get_attr: [db_server, first_address] }
-```
-
----
-
-## การใช้งาน Heat CLI
+ใช้ `openstack image list`, `openstack flavor list` และ `openstack network list` เพื่อหา ID ตามที่ผู้สอนกำหนด แล้วแทนค่าใน Bash ใช้เทอร์มินัลเดิมตลอดกิจกรรม
 
 ```bash
-# สร้าง Stack
-openstack stack create -t 3tier-app.yaml --parameter key_name=my-key webapp-stack
-
-# แสดงรายการ Stacks
-openstack stack list
-
-# ดูรายละเอียด Stack
-openstack stack show webapp-stack
-
-# ดู Events (การสร้างแต่ละ Step)
-openstack stack event list webapp-stack
-
-# อัปเดต Stack (แก้ไข Template แล้ว Deploy ใหม่)
-openstack stack update -t 3tier-app-v2.yaml webapp-stack
-
-# ลบ Stack (ลบทุก Resources ที่สร้างไว้)
-openstack stack delete webapp-stack
-
-# ดู Outputs
-openstack stack output list webapp-stack
-openstack stack output show webapp-stack web_url
+STACK='lec09-teamXX'
+IMAGE_ID='แทนด้วย Image UUID'
+FLAVOR_ID='แทนด้วย Flavor ID'
+NETWORK_ID='แทนด้วย Network UUID'
 ```
 
----
+### ขั้นที่ 2 — สร้าง Stack แล้วจับคู่ Resource (15–20 นาที)
 
-## Auto Scaling
+```bash
+openstack stack create --wait -t lec09-stack.yaml \
+  --parameter "image_id=$IMAGE_ID" \
+  --parameter "flavor_id=$FLAVOR_ID" \
+  --parameter "network_id=$NETWORK_ID" "$STACK"
 
-```yaml
-resources:
-  web_server_group:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      cooldown: 60
-      min_size: 1
-      max_size: 5
-      resource:
-        type: OS::Nova::Server
-        properties:
-          image: ubuntu-22.04
-          flavor: m1.small
-          networks:
-            - network: app-network
-
-  scale_up_policy:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      scaling_adjustment: 1
-      auto_scaling_group_id: { get_resource: web_server_group }
-
-  cpu_alarm_high:
-    type: OS::Ceilometer::Alarm
-    properties:
-      meter_name: cpu_util
-      statistic: avg
-      period: 600
-      evaluation_periods: 1
-      threshold: 80
-      comparison_operator: gt
-      alarm_actions:
-        - { get_attr: [scale_up_policy, alarm_url] }
+openstack stack resource list "$STACK"
+openstack stack output show "$STACK" vm_id
+openstack stack output show "$STACK" port_id
 ```
 
----
+รอให้เป็น `CREATE_COMPLETE` แล้วบันทึก UUID ของ VM และ Port จาก Outputs ตรวจด้วย `openstack port list --server VM_UUID` โดยแทน `VM_UUID` ด้วยค่าจริง หากขึ้น `CREATE_FAILED` ให้ใช้ `openstack stack event list "$STACK"` หา Resource และเหตุผลที่ล้มเหลวก่อนเริ่มขั้นถัดไป
+
+### ขั้นที่ 3 — อัปเดต Metadata แล้วตรวจ VM เดิม (10–15 นาที)
+
+```bash
+openstack stack update --existing --wait \
+  --parameter lab_stage=verified "$STACK"
+openstack stack output show "$STACK" vm_id
+```
+
+`--existing` ใช้ Template และค่าก่อนหน้าเป็นฐาน โดยคำสั่งนี้ส่งค่าใหม่เฉพาะ `lab_stage` เมื่อ Stack เป็น `UPDATE_COMPLETE` ให้เทียบ UUID กับผลก่อนอัปเดต แล้วตรวจ `openstack server show VM_UUID -c id -c properties` ว่า `lab_stage` เปลี่ยนเป็น `verified` หากอัปเดตล้มเหลว ให้ตรวจ Events และบันทึกสถานะจริงก่อนดำเนินการต่อ
+
+### งานส่งและคืนทรัพยากร (10 นาที)
+
+- ส่ง Stack Status, VM UUID, Port UUID และค่า Metadata ก่อนกับหลัง Update ใช้ `openstack server show VM_UUID -c id -c properties` เก็บค่าก่อนอัปเดตด้วย
+- อธิบายว่า **Heat รู้ได้อย่างไรว่าต้องสร้าง Port ก่อน VM** และ **หลักฐานใดแสดงว่า Update ใช้ VM เดิม**
+- ตรวจชื่อ Stack ของกลุ่มก่อนใช้ `openstack stack delete --wait "$STACK"` จากนั้นตรวจว่า Stack, VM และ Port ที่สร้างหายจากรายการ ส่วน Network ที่รับผ่านพารามิเตอร์ยังอยู่
 
 ## สไลด์การบรรยาย
 
@@ -308,6 +135,7 @@ resources:
 
 ## แหล่งข้อมูลเพิ่มเติม
 
-- [Heat Documentation](https://docs.openstack.org/heat/latest/)
-- [HOT Template Guide](https://docs.openstack.org/heat/latest/template_guide/)
-- [Heat Admin Guide](https://docs.openstack.org/heat/latest/admin/)
+- [Heat 2026.2 — HOT Specification](https://docs.openstack.org/heat/2026.2/template_guide/hot_spec.html)
+- [Heat 2026.2 — OpenStack Resource Types](https://docs.openstack.org/heat/2026.2/template_guide/openstack.html)
+- [Heat Client 2026.2 — Stack Commands](https://docs.openstack.org/python-heatclient/2026.2/cli/stack.html)
+- [Heat and DevStack](https://docs.openstack.org/heat/latest/getting_started/on_devstack.html)
