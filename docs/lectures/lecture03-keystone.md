@@ -20,25 +20,22 @@ Keystone คือ **บริการ Identity** ของ OpenStack ให้
 
 ## แนวคิดหลัก
 
-```
-┌─────────────────────────────────────────┐
-│               Domain                     │
-│  ┌─────────────────────────────────┐    │
-│  │          Project (Tenant)        │   │
-│  │  ┌───────────────────────────┐   │   │
-│  │  │         User               │   │   │
-│  │  │  Role: admin / member / reader │ │
-│  │  └───────────────────────────┘   │   │
-│  └─────────────────────────────────┘    │
-└─────────────────────────────────────────┘
-```
+Domain เป็นขอบเขตสำหรับจัดการ Users, Groups และ Projects โดย User กับ Project เป็นคนละรายการ ส่วน **Role Assignment** เชื่อมผู้ใช้หรือกลุ่มกับ Role ในขอบเขตที่กำหนด
+
+| ผู้ใช้ใน Domain เดียวกัน | Role | ขอบเขตของ Role Assignment |
+|---|---|---|
+| บัญชีที่ 1 | `member` | Project A |
+| บัญชีที่ 2 | `member` | Project A |
+| บัญชีที่ 2 | `member` | Project B |
+
+ผู้ใช้คนเดียวจึงมี Role Assignment ได้หลาย Project
 
 ### Domain
 - Namespace ระดับสูงสุดสำหรับ Users, Groups และ Projects
 - รองรับ Multi-tenancy ระดับองค์กร
 - Domain เริ่มต้น: `default`
 
-### Project (เดิมช Tenant)
+### Project (เดิมเรียกว่า Tenant)
 - คอนเทนเนอร์สำหรับทรัพยากร (VMs, Networks, Volumes)
 - ผู้ใช้ได้รับสิทธิ์ผ่าน Roles ภายใน Project
 
@@ -63,14 +60,18 @@ User credentials → Keystone
     ↓
 Keystone ตรวจสอบ credentials
     ↓
-คืน Token (UUID หรือ JWT)
+ออก Token ตาม scope ที่ขอและได้รับอนุญาต
     ↓
 User นำ Token ไปแสดงต่อบริการอื่น ๆ
     ↓
-บริการอื่น ๆ ขอ Keystone ตรวจสอบ Token
+บริการตรวจสอบ Token และใช้ Policy ของตนตัดสินสิทธิ์
 ```
 
-### รูปแบบ Token
+### Project Scope
+
+Token ที่มี Project Scope ใช้ในบริบทของ Project ที่ระบุ เมื่อสลับจาก Project A ไป Project B ระบบใช้ Token สำหรับ Project B และบริการตรวจสิทธิ์ตาม Role และขอบเขตของ Token นั้น ส่วน Unscoped Token ใช้ยืนยันตัวตนโดยยังไม่มี Roles, Service Catalog หรือขอบเขตการอนุญาต
+
+### รูปแบบ Token (รวมรูปแบบในอดีต)
 
 | รูปแบบ | คำอธิบาย |
 |------|-------------|
@@ -141,6 +142,43 @@ openstack token issue
 
 ---
 
+## Workshop ท้ายบท — ทดลอง Project Scope บน DevStack
+
+**เวลา** 45–60 นาที · **รูปแบบ** กลุ่มละ 2–3 คน
+
+### สิ่งที่ผู้สอนเตรียม
+
+- สร้าง Project A และ B ใน Domain เดียวกัน และเตรียม VM ชื่อแตกต่างกันหนึ่งเครื่องต่อ Project เช่น `keystone-a-vm` และ `keystone-b-vm`
+- เตรียมบัญชีทดสอบตามตาราง Role Assignment ด้านบน และตรวจล่วงหน้าว่าบัญชีแรกเข้าได้เฉพาะ Project A ส่วนบัญชีที่สองเข้าได้ทั้งสอง Project
+- ตั้งค่า OpenStack CLI profiles `keystone-a` และ `keystone-b` ให้ใช้บัญชีที่สอง โดยแต่ละ profile ขอ Token สำหรับ Project ที่ตรงกับชื่อ
+
+### ขั้นที่ 1 — เปรียบเทียบบัญชีใน Horizon (10 นาที)
+
+เข้าสู่ Horizon ด้วยบัญชีแรก จด Project ที่เลือกได้ และชื่อ VM ใน **Project → Compute → Instances** จากนั้นออกจากระบบ เข้าด้วยบัญชีที่สอง และเปรียบเทียบรายชื่อ Project
+
+### ขั้นที่ 2 — สลับ Project ด้วยบัญชีเดิม (10–15 นาที)
+
+ด้วยบัญชีที่สอง เลือก Project A แล้วบันทึกชื่อและ UUID ของ VM ที่เห็น ทำซ้ำกับ Project B หากผลต่างจากที่คาด ให้บันทึกผลจริงและให้ผู้สอนตรวจ Project ที่เลือกกับ Role Assignment ของบัญชี
+
+### ขั้นที่ 3 — ตรวจสอบผลด้วย CLI (15–20 นาที)
+
+```bash
+for cloud in keystone-a keystone-b; do
+  printf '\nProfile: %s\n' "$cloud"
+  openstack --os-cloud "$cloud" token issue -c project_id -c expires
+  openstack --os-cloud "$cloud" server list
+  openstack --os-cloud "$cloud" catalog list
+done
+```
+
+1. เทียบ `project_id` และ UUID ของ VM จาก CLI กับผลใน Horizon
+2. หา Endpoint ของบริการ `compute` ใน Catalog จด Region และ Interface ที่พบ แล้วดูว่าทั้งสองโปรไฟล์ชี้ไปยังบริการเดียวกันหรือไม่
+3. บันทึกเฉพาะข้อมูลที่ใช้ตอบโจทย์ ให้รหัสผ่าน ค่า Token และไฟล์ Credentials อยู่ในเครื่องทดสอบ
+
+### งานส่ง (10–15 นาที)
+
+ส่งตาราง **บัญชี | Project | Project ID (เมื่อมี) | VM ที่เห็น** พร้อมหลักฐานจาก Horizon และ CLI แล้วตอบว่า **เหตุใดผู้ใช้คนเดิมที่มี Role `member` ในทั้งสอง Project จึงเห็น VM คนละชุดเมื่อสลับ Project** ให้แยกบทบาทของ Authentication, Role Assignment, Project Scope และ Policy ในคำตอบ
+
 ## สไลด์การบรรยาย
 
 📥 [ดาวน์โหลดสไลด์การบรรยายที่ 3 (PDF)](../assets/slides/Keystone%20ระบบจัดการตัวตนและสิทธิ์.pdf){ .md-button }
@@ -148,4 +186,5 @@ openstack token issue
 ## แหล่งข้อมูลเพิ่มเติม
 
 - [Keystone Administrator Guide](https://docs.openstack.org/keystone/latest/admin/)
-- [RBAC ใน OpenStack](https://docs.openstack.org/keystone/latest/admin/auth-tokens.html)
+- [Keystone — Default Roles](https://docs.openstack.org/keystone/latest/admin/service-api-protection.html)
+- [Keystone — Token Scopes](https://docs.openstack.org/keystone/latest/admin/tokens-overview.html)
