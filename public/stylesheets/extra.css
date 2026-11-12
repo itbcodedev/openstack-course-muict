@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: "Noto Sans Thai", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.md-typeset {
+  font-family: "Noto Sans Thai", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.md-nav {
+  font-family: "Noto Sans Thai", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.md-header__title {
+  font-family: "Noto Sans Thai", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Custom Admonition: lab */
+.md-typeset .admonition.lab,
+.md-typeset details.lab {
+  border-color: #00bfa5;
+}
+
+.md-typeset .lab > .admonition-title,
+.md-typeset .lab > summary {
+  background-color: rgba(0, 191, 165, 0.1);
+}
+
+.md-typeset .lab > .admonition-title::before,
+.md-typeset .lab > summary::before {
+  background-color: #00bfa5;
+  -webkit-mask-image: var(--md-admonition-icon--lab);
+  mask-image: var(--md-admonition-icon--lab);
+}
+
+/* Custom Admonition: homework */
+.md-typeset .admonition.homework,
+.md-typeset details.homework {
+  border-color: #ff9100;
+}
+
+.md-typeset .homework > .admonition-title,
+.md-typeset .homework > summary {
+  background-color: rgba(255, 145, 0, 0.1);
+}
+
+.md-typeset .homework > .admonition-title::before,
+.md-typeset .homework > summary::before {
+  background-color: #ff9100;
+  -webkit-mask-image: var(--md-admonition-icon--homework);
+  mask-image: var(--md-admonition-icon--homework);
+}
+
+/* Custom Admonition: exam */
+.md-typeset .admonition.exam,
+.md-typeset details.exam {
+  border-color: #d50000;
+}
+
+.md-typeset .exam > .admonition-title,
+.md-typeset .exam > summary {
+  background-color: rgba(213, 0, 0, 0.1);
+}
+
+.md-typeset .exam > .admonition-title::before,
+.md-typeset .exam > summary::before {
+  background-color: #d50000;
+  -webkit-mask-image: var(--md-admonition-icon--exam);
+  mask-image: var(--md-admonition-icon--exam);
+}
+
+/* Custom Admonition: config */
+.md-typeset .admonition.config,
+.md-typeset details.config {
+  border-color: #2962ff;
+}
+
+.md-typeset .config > .admonition-title,
+.md-typeset .config > summary {
+  background-color: rgba(41, 98, 255, 0.1);
+}
+
+.md-typeset .config > .admonition-title::before,
+.md-typeset .config > summary::before {
+  background-color: #2962ff;
+  -webkit-mask-image: var(--md-admonition-icon--config);
+  mask-image: var(--md-admonition-icon--config);
+}
+
+:root {
+  --md-admonition-icon--lab: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 5.63L18.37 3.29a.996.996 0 0 0-1.41 0l-2.34 2.34a.996.996 0 0 0 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0l2.34-2.34a.996.996 0 0 0 0-1.41M3 17.25V21h3.75l9.68-9.69-3.75-3.75L3 17.25M17.25 3l-3.75 3.75 3.75 3.75 3.75-3.75L17.25 3z"/></svg>');
+  --md-admonition-icon--homework: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1M9.29 14.71 7.11 12.53a.996.996 0 1 1 1.41-1.41l1.41 1.41 3.54-3.54a.996.996 0 1 1 1.41 1.41l-4.24 4.24c-.39.4-1.02.4-1.42.01z"/></svg>');
+  --md-admonition-icon--exam: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5 14H7v-2h7v2m3-4H7v-2h10v2m0-4H7V7h10v2z"/></svg>');
+  --md-admonition-icon--config: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.04.64.09.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>');
+}
