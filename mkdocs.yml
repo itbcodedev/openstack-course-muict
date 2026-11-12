@@ -89,8 +89,9 @@ nav:
     - lectures/lecture10-ceilometer.md
   - การทดลอง:
     - labs/lab00-centos-hyperv.md
-    - labs/lab01-devstack-centos.md
+    #- labs/lab01-devstack-centos.md
     - labs/lab01-devstack-ubuntu.md
+    - labs/lab01-import-devstack.md
     - labs/lab02-horizon.md
     - labs/lab03-cli.md
   - แหล่งข้อมูล: resources.md

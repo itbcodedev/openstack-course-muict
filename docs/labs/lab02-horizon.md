@@ -14,10 +14,21 @@ title: "การทดลองที่ 2: Horizon Dashboard และกา�
 
 ### เข้าสู่ระบบ
 
-1. เปิดเบราว์เซอร์: `http://10.20.30.11/dashboard`
+1. เปิดเบราว์เซอร์: `http://10.0.0.11/dashboard`
 2. Domain: `default`
-3. Username: `admin`
-4. Password: `Muict@2024` (หรือ ADMIN_PASSWORD ที่ตั้งไว้)
+3. Username: `admin`  `demo`
+4. Password: `Muict2024` (หรือ ADMIN_PASSWORD ที่ตั้งไว้)
+
+- login horizon dashboard
+![](./images/lab02-1.png)
+
+- user admin
+![](./images/lab02-2.png)
+- user admin มี 2 project
+![](./images/lab02-1.png)
+- user demo
+![](./images/lab02-3.png)
+
 
 ### โครงสร้าง Dashboard
 
