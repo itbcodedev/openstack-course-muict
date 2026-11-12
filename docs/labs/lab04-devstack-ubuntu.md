@@ -1,3 +1,7 @@
+---
+title: "แทนที่การกำหนดค่าเดิมที่ชี้ไปที่ keystone-wsgi-public"
+---
+
 install 
 
 cd /opt/stack

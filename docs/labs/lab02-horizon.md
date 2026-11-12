@@ -1,3 +1,7 @@
+---
+title: "การทดลองที่ 2: Horizon Dashboard และการจัดการ Project"
+---
+
 # การทดลองที่ 2: Horizon Dashboard และการจัดการ Project
 
 ## วัตถุประสงค์

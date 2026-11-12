@@ -1,0 +1,2257 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="เอกสารประกอบการสอน OpenStack Cloud Computing - คณะเทคโนโลยีสารสนเทศและการสื่อสาร มหาวิทยาลัยมหิดล">
+      
+      
+      
+        <link rel="canonical" href="https://itbcodedev.github.io/openstack-course-muict/labs/lab01-devstack-ubuntu/">
+      
+      
+      
+      
+        
+      
+      
+      
+      
+        
+        
+        
+          <link rel="icon" href="../../assets/images/favicon.png">
+        
+      
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-materialx-10.2.2">
+    
+    
+      
+        <title>การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 9 - วิชา OpenStack Cloud Computing | MUICT</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.1d60cbd7.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a45159b5.min.css">
+      
+    
+    
+
+    
+
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber" data-mx-topbar="glass">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="toc" type="checkbox" id="__toc" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <label class="md-overlay" for="__toc"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-devstack-centos-stream-9" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="วิชา OpenStack Cloud Computing | MUICT" class="md-header__button md-logo" aria-label="วิชา OpenStack Cloud Computing | MUICT" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            วิชา OpenStack Cloud Computing | MUICT
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 9
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="สลับเป็นโหมดมืด"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="สลับเป็นโหมดมืด" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="สลับเป็นโหมดสว่าง"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="สลับเป็นโหมดสว่าง" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.25 2a8.25 8.25 0 0 1 6.34 13.53l5.69 5.69a.749.749 0 0 1-.326 1.275.75.75 0 0 1-.734-.215l-5.69-5.69A8.25 8.25 0 1 1 10.25 2M3.5 10.25a6.75 6.75 0 1 0 13.5 0 6.75 6.75 0 0 0-13.5 0"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.25 2a8.25 8.25 0 0 1 6.34 13.53l5.69 5.69a.749.749 0 0 1-.326 1.275.75.75 0 0 1-.734-.215l-5.69-5.69A8.25 8.25 0 1 1 10.25 2M3.5 10.25a6.75 6.75 0 1 0 13.5 0 6.75 6.75 0 0 0-13.5 0"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0">
+        <div class="md-search-result md-search-result--pagefind" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/itbcodedev/openstack-course-muict" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  หน้าแรก
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../syllabus/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  หลักสูตร
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../lectures/lecture01-introduction/" class="md-tabs__link">
+          
+  
+  
+  การบรรยาย
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../lab00-centos-hyperv/" class="md-tabs__link">
+          
+  
+  
+  การทดลอง
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../resources/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  แหล่งข้อมูล
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="วิชา OpenStack Cloud Computing | MUICT" class="md-nav__button md-logo" aria-label="วิชา OpenStack Cloud Computing | MUICT" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    วิชา OpenStack Cloud Computing | MUICT
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/itbcodedev/openstack-course-muict" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list">
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    หน้าแรก
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../syllabus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    หลักสูตร
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยาย
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    การบรรยาย
+  
+
+          </label>
+          <ul class="md-nav__list">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture01-introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 1: บทนำสู่ Cloud Computing และ OpenStack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture02-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 2: สถาปัตยกรรมและส่วนประกอบของ OpenStack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture03-keystone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 3: Keystone — ระบบจัดการตัวตนและสิทธิ์
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture04-nova/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 4: Nova — บริการ Compute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture05-neutron/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 5: Neutron — บริการเครือข่าย
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture06-glance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 6: Glance — บริการ Image
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture07-cinder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 7: Cinder — บริการ Block Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture08-swift/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 8: Swift — บริการ Object Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture09-heat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 9: Heat — บริการ Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture10-ceilometer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 10: Ceilometer / Gnocchi — การวัดการใช้ทรัพยากร
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture11-kolla-ansible/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 11: ติดตั้ง OpenStack ด้วย Kolla-Ansible
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../lectures/lecture12-troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การบรรยายที่ 12: การวินิจฉัยและแก้ปัญหา OpenStack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การทดลอง
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    การทดลอง
+  
+
+          </label>
+          <ul class="md-nav__list">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab00-centos-hyperv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การทดลองที่ 0: ติดตั้ง CentOS Stream 9 บน Hyper-V
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab01-devstack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 9
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab02-horizon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การทดลองที่ 2: Horizon Dashboard และการจัดการ Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lab03-cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    การทดลองที่ 3: การใช้งาน OpenStack CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    แหล่งข้อมูล
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc">
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        วัตถุประสงค์
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ข้อกำหนด
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: เตรียมระบบ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: เตรียมระบบ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#powershell-administrator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Powershell Administrator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        สลับไปยังผู้ใช้ stack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-clone-devstack-branch-stable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Clone DevStack และ ทำงานใน Branch stable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upgrade-pyton-311-centos-9-stream" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        upgrade pyton เป็น 3.11 centos 9 stream
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-devstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: กำหนดค่า DevStack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#devstack-localconf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Devstack เรียกใช้งาน local.conf ได้อย่างไร ?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Devstack เรียกใช้งาน local.conf ได้อย่างไร ?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 ลำดับการโหลดและตำแหน่งไฟล์
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📝 กฎไวยากรณ์สำคัญ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-devstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: รันคำสั่งติดตั้ง DevStack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step คำสั่งที่ใช้
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        กรณีที่รันซ้ำได้ปลอดภัย
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="กรณีที่รันซ้ำได้ปลอดภัย">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🧹 คำสั่งที่ควรรู้
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        หากมีการเปิด ปิดเครื่อง
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: ตรวจสอบการติดตั้ง
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 5: ตรวจสอบการติดตั้ง">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        โหลด Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ตรวจสอบบริการต่าง ๆ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#horizon-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ตรวจสอบ Horizon Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-vm-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6: สร้าง VM ตัวแรกผ่าน CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ปัญหาที่พบบ่อย
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ปัญหาที่พบบ่อย">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ovn-open-virtual-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        การเปลี่ยนผ่านสู่ OVN (Open Virtual Network):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ovn-management-plan-control-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OVN management plan และ Control plan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-ovn-management-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. OVN Management Plane (ระดับการจัดการและกำหนดนโยบาย)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-ovn-control-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. OVN Control Plane (ระดับควบคุมและสั่งการ)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        สรุปภาพรวมการทำงาน (Flow)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        การล้างข้อมูลและเริ่มใหม่
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        สรุปการตั้งค่าเครือข่าย
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="สรุปการตั้งค่าเครือข่าย">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#script-br-ex" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ขั้นตอนการทำงานเบื้องหลังของ Script เมื่อสร้าง br-ex
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#note-listnetwork" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Note : Listnetwork
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#virtual-switch-lab" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        สร้าง virtual switch ในเครื่อง lab
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-vm-command-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        import vm command line
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              
+              
+              <article class="md-content__inner md-typeset" data-pagefind-body>
+                
+                  
+  
+  
+
+
+<h1 id="1-devstack-centos-stream-9">การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 9<a class="headerlink" href="#1-devstack-centos-stream-9" title="Permanent link">&para;</a></h1>
+<h2 id="_1">วัตถุประสงค์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>ติดตั้งสภาพแวดล้อม OpenStack แบบ All-in-One บน CentOS Stream 10 โดยใช้ DevStack บน Virtual Machine ที่สร้างจาก <a href="../lab00-centos-hyperv/">Lab 0: ติดตั้ง CentOS Stream 10 บน Hyper-V</a></p>
+<hr />
+<h2 id="_2">ข้อกำหนด<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>รายการ</th>
+<th>ข้อกำหนด</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ระบบปฏิบัติการ</td>
+<td>CentOS Stream 10 (ติดตั้งจาก Lab 0)</td>
+</tr>
+<tr>
+<td>หน่วยความจำ (RAM)</td>
+<td>8 GB (8192 MB)</td>
+</tr>
+<tr>
+<td>ดิสก์</td>
+<td>60 GB</td>
+</tr>
+<tr>
+<td>ผู้ใช้</td>
+<td><code>stack</code> (non-root พร้อม sudo NOPASSWD)</td>
+</tr>
+<tr>
+<td>เครือข่าย</td>
+<td>3 adapters ตามที่ตั้งค่าใน Lab 0</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="step-1">Step 1: เตรียมระบบ<a class="headerlink" href="#step-1" title="Permanent link">&para;</a></h2>
+<h3 id="powershell-administrator">Powershell Administrator<a class="headerlink" href="#powershell-administrator" title="Permanent link">&para;</a></h3>
+<ul>
+<li>เปิดการใช้งาน  Nested Hyper-V virtualization เพื่อให้ VM เข้าถึงชั้นของ Hypervisor ได้โดยตรง จำเป็นต้องทำ</li>
+</ul>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># 1. ตรวจสอบสถานะเครื่องเสมือน (ต้องเป็น Off)
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Get-VM -Name "DevStackCentos9Stream"
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a># 2. ปิดเครื่องเสมือนให้สนิท (ถ้ายังไม่ Off)
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Stop-VM -Name "DevStackCentos9Stream" -Force
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a># 3. เปิดใช้งาน Nested Virtualization (คำสั่งหลัก)
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Set-VMProcessor -VMName "DevStackCentos9Stream" -ExposeVirtualizationExtensions $true
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a># 4. เปิด MAC Address Spoofing (จำเป็นสำหรับ nested VM ออกเครือข่าย)
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>Get-VMNetworkAdapter -VMName "DevStackCentos9Stream" | Set-VMNetworkAdapter -MacAddressSpoofing On
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a># 5. ตรวจสอบว่าเปิด Nested Virtualization สำเร็จ
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>Get-VMProcessor -VMName "DevStackCentos9Stream" | Select-Object ExposeVirtualizationExtensions
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a># 6. ตรวจสอบว่า MAC Spoofing เปิดอยู่
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>Get-VMNetworkAdapter -VMName "DevStackCentos9Stream" | Select-Object Name, MacAddressSpoofing
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a># 7. เปิดเครื่องเสมือนกลับมา
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>Start-VM -Name "DevStackCentos9Stream"
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a># 8 ทดสอบ vmx  สำหรับ intel,  svm สำหรับ AMD และ kvm
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>grep -E 'vmx|svm' /proc/cpuinfo
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>lscpu | grep -i virtualization
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>lsmod | grep kvm
+</span></code></pre></div>
+<p><img alt="" src="../images/lab01-2.png" /></p>
+<h3 id="stack">สลับไปยังผู้ใช้ stack<a class="headerlink" href="#stack" title="Permanent link">&para;</a></h3>
+<p><img alt="" src="../images/lab01-3.png" /></p>
+<ul>
+<li>ให้เข้าใช้งาน ไปที่ Linux Terminal สามารถ เปิด ผ่าน GUI แต่แนะนำ ให้เข้าผ่าน Window Termial ssh เข้าไป  ip 172.24.90.184</li>
+</ul>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ssh stack@172.24.84.37
+</span></code></pre></div>
+<img alt="" src="../images/lab01-4.png" /></p>
+<p>ควรเห็น 3 interfaces:
+- <code>eth0</code>: IP จาก DHCP (hyper-v) และ ได้ทำการเปลี่ยนให้เป็น Static ip แล้ว 172.24.84.37
+- <code>eth1</code>: 10.0.0.10 (Management)
+- <code>eth2</code>: 192.168.56.10 (External / สำหรับ br-ex)</p>
+<ul>
+<li>เราได้สร้าง user stack ตั้งแต่ สร้าง VM ใน hyperV เรียบร้อย
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"stack ALL=(ALL) NOPASSWD: ALL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/sudoers.d/stack
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>-u<span class="w"> </span>stack<span class="w"> </span>-i
+</span></code></pre></div></li>
+</ul>
+<p><img alt="" src="../images/lab01-5.png" /></p>
+<p>หรือหาก VM ยังไม่ได้สร้างผู้ใช้ stack: (lab ข้ามข้อนี้) เช่นในกรณีที่ linux server มี user ชื่อ stack</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>useradd<span class="w"> </span>-s<span class="w"> </span>/bin/bash<span class="w"> </span>-d<span class="w"> </span>/opt/stack<span class="w"> </span>-m<span class="w"> </span>stack
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"stack ALL=(ALL) NOPASSWD: ALL"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/sudoers.d/stack
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>sudo<span class="w"> </span>-u<span class="w"> </span>stack<span class="w"> </span>-i
+</span></code></pre></div>
+<hr />
+<h2 id="step-2-clone-devstack-branch-stable">Step 2: Clone DevStack และ ทำงานใน Branch stable<a class="headerlink" href="#step-2-clone-devstack-branch-stable" title="Permanent link">&para;</a></h2>
+<ul>
+<li>เนื้อหาหลัก <a href="https://docs.openstack.org/devstack/latest/">https://docs.openstack.org/devstack/latest/</a></li>
+</ul>
+<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">755</span><span class="w"> </span>/opt/stack
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>/opt/stack
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>git<span class="w"> </span>clone<span class="w"> </span>https://opendev.org/openstack/devstack
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">cd</span><span class="w"> </span>devstack
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>git<span class="w"> </span>branch<span class="w"> </span>-a
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># checkout code branch stable</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>git<span class="w"> </span>checkout<span class="w"> </span>stable/2026.2
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># ยืนยันว่าว่าอยู่บน Branch stable/2026.2 จริง</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>git<span class="w"> </span>branch
+</span></code></pre></div>
+<img alt="" src="../images/lab01-7.png" /></p>
+<hr />
+<p><img alt="" src="../images/lab01-8.png" /></p>
+<h2 id="upgrade-pyton-311-centos-9-stream">upgrade pyton เป็น 3.11 centos 9 stream<a class="headerlink" href="#upgrade-pyton-311-centos-9-stream" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># 1. ติดตั้ง Python 3.11 และ pip
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo dnf install -y python3.11 python3.11-devel python3.11-pip
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a># 2. ตรวจสอบ
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>python3.11 --version
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>python3.11 -m pip --version
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>export PYTHON3_VERSION=3.11
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a># 3. กำหนดค่าบังคับใน local.conf
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a># เพิ่มในส่วน [[local|localrc]]
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>PYTHON3_VERSION=3.11
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3.11 -V
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>pip3.11 -V
+</span></code></pre></div>
+<h2 id="_3"><a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>``</p>
+<h2 id="step-3-devstack">Step 3: กำหนดค่า DevStack<a class="headerlink" href="#step-3-devstack" title="Permanent link">&para;</a></h2>
+<p>สร้างไฟล์ <code>local.conf</code> โดยใช้ค่าที่เหมาะสมกับเครือข่าย 3 ตัวบน Hyper-V:
+(ให้ copy code ข้างล่างไป วางใน Terminal) โครงสร้างนี้เรียกว่า <a href="https://linuxize.com/post/bash-heredoc/">bash heredoc</a> ทำให้เราสามารถ copy เนื้อหาไป สร้าง file ได้ โดยตรง</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cat<span class="w"> </span>&gt;<span class="w"> </span>local.conf<span class="w"> </span><span class="s">&lt;&lt; 'EOF'</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="s">[[local|localrc]]</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="s">ADMIN_PASSWORD=Muict2024</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="s">DATABASE_PASSWORD=$ADMIN_PASSWORD</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="s">RABBIT_PASSWORD=$ADMIN_PASSWORD</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="s">SERVICE_PASSWORD=$ADMIN_PASSWORD</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="s">SERVICE_IP_VERSION=4</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="s">IP_VERSION=4</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s">PYTHON3_VERSION=3.11</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="s"># IP ของ Management Interface (eth1) — ใช้กับ Horizon / API</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="s">HOST_IP=10.0.0.10</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="s"># Enable Service</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="s">enable_service rabbit mysql key</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="s">enable_service n-api n-cpu n-cond n-sch n-novnc n-cauth</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="s">enable_service g-api g-reg</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="s">enable_service cinder c-sch c-api c-vol</span>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="s">enable_service neutron q-svc q-ovn-metadata-agent</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="s">enable_service s-proxy s-object s-container s-account</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="s">enable_service placement-api</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="s"># เปิดใช้งานปลั๊กอิน Heat</span>
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="s">enable_plugin heat https://opendev.org/openstack/heat</span>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="s"># Cinder</span>
+</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="s">VOLUME_GROUP_NAME="stack-volumes"</span>
+</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="s">VOLUME_NAME_PREFIX="volume-"</span>
+</span><span id="__span-7-30"><a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="s">VOLUME_BACKING_FILE_SIZE=24G</span>
+</span><span id="__span-7-31"><a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>
+</span><span id="__span-7-32"><a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="s"># ===== Neutron Networking สำหรับ Hyper-V 3 Adapters =====</span>
+</span><span id="__span-7-33"><a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="s"># External Network สำหรับ Floating IPs</span>
+</span><span id="__span-7-34"><a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="s">FLOATING_RANGE=192.168.56.0/24</span>
+</span><span id="__span-7-35"><a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a><span class="s">PUBLIC_BRIDGE=br-ex</span>
+</span><span id="__span-7-36"><a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a><span class="s">Q_FLOATING_ALLOCATION_POOL=start=192.168.56.100,end=192.168.56.200</span>
+</span><span id="__span-7-37"><a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a>
+</span><span id="__span-7-38"><a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a><span class="s"># Physical interface สำหรับ br-ex bridge (eth2)</span>
+</span><span id="__span-7-39"><a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a><span class="s">FLAT_INTERFACE=eth2</span>
+</span><span id="__span-7-40"><a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a><span class="s">PUBLIC_INTERFACE=eth2</span>
+</span><span id="__span-7-41"><a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a>
+</span><span id="__span-7-42"><a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a><span class="s"># Private Network สำหรับ VM ภายใน</span>
+</span><span id="__span-7-43"><a id="__codelineno-7-43" name="__codelineno-7-43" href="#__codelineno-7-43"></a><span class="s">FIXED_RANGE=10.10.10.0/24</span>
+</span><span id="__span-7-44"><a id="__codelineno-7-44" name="__codelineno-7-44" href="#__codelineno-7-44"></a><span class="s">FIXED_NETWORK_SIZE=256</span>
+</span><span id="__span-7-45"><a id="__codelineno-7-45" name="__codelineno-7-45" href="#__codelineno-7-45"></a>
+</span><span id="__span-7-46"><a id="__codelineno-7-46" name="__codelineno-7-46" href="#__codelineno-7-46"></a><span class="s"># ปิดบริการที่ไม่จำเป็นสำหรับ Lab</span>
+</span><span id="__span-7-47"><a id="__codelineno-7-47" name="__codelineno-7-47" href="#__codelineno-7-47"></a><span class="s">disable_service tempest</span>
+</span><span id="__span-7-48"><a id="__codelineno-7-48" name="__codelineno-7-48" href="#__codelineno-7-48"></a>
+</span><span id="__span-7-49"><a id="__codelineno-7-49" name="__codelineno-7-49" href="#__codelineno-7-49"></a><span class="s"># การบันทึก Log</span>
+</span><span id="__span-7-50"><a id="__codelineno-7-50" name="__codelineno-7-50" href="#__codelineno-7-50"></a><span class="s">LOGFILE=/opt/stack/logs/stack.sh.log</span>
+</span><span id="__span-7-51"><a id="__codelineno-7-51" name="__codelineno-7-51" href="#__codelineno-7-51"></a><span class="s">LOGDAYS=2</span>
+</span><span id="__span-7-52"><a id="__codelineno-7-52" name="__codelineno-7-52" href="#__codelineno-7-52"></a><span class="s">LOG_COLOR=True</span>
+</span><span id="__span-7-53"><a id="__codelineno-7-53" name="__codelineno-7-53" href="#__codelineno-7-53"></a><span class="s">VERBOSE=True</span>
+</span><span id="__span-7-54"><a id="__codelineno-7-54" name="__codelineno-7-54" href="#__codelineno-7-54"></a>
+</span><span id="__span-7-55"><a id="__codelineno-7-55" name="__codelineno-7-55" href="#__codelineno-7-55"></a><span class="s"># Download Fedora image</span>
+</span><span id="__span-7-56"><a id="__codelineno-7-56" name="__codelineno-7-56" href="#__codelineno-7-56"></a><span class="s">IMAGE_URL_SITE="https://download.fedoraproject.org"</span>
+</span><span id="__span-7-57"><a id="__codelineno-7-57" name="__codelineno-7-57" href="#__codelineno-7-57"></a><span class="s">IMAGE_URL_PATH="/pub/fedora/linux/releases/45/Cloud/x86_64/images/"</span>
+</span><span id="__span-7-58"><a id="__codelineno-7-58" name="__codelineno-7-58" href="#__codelineno-7-58"></a><span class="s">IMAGE_URL_FILE="Fedora-Cloud-Base-Generic-45-1.4.x86_64.qcow2"</span>
+</span><span id="__span-7-59"><a id="__codelineno-7-59" name="__codelineno-7-59" href="#__codelineno-7-59"></a><span class="s">IMAGE_URLS+=","$IMAGE_URL_SITE$IMAGE_URL_PATH$IMAGE_URL_FILE</span>
+</span><span id="__span-7-60"><a id="__codelineno-7-60" name="__codelineno-7-60" href="#__codelineno-7-60"></a><span class="s">EOF</span>
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Verify 
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>cat local.conf
+</span></code></pre></div>
+<div class="admonition config">
+<p class="admonition-title"><img alt="⚙" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2699.svg" title=":gear:" /> สำคัญ: ปรับ HOST_IP</p>
+<p>ปรับ <code>HOST_IP</code> ให้ตรงกับ IP ของ Management Interface (eth1) บน VM ของคุณ
+ใช้คำสั่ง <code>ip addr show eth1</code> เพื่อตรวจสอบ</p>
+</div>
+<div class="admonition config">
+<p class="admonition-title"><img alt="🔒" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:" /> รหัสผ่าน</p>
+<p>เปลี่ยน <code>ADMIN_PASSWORD</code> ให้ปลอดภัย ในตัวอย่างใช้ <code>Muict2024</code> ค่าอื่น ๆ จะใช้รหัสเดียวกันเพื่อความสะดวกใน Lab</p>
+</div>
+<hr />
+<h2 id="devstack-localconf">Devstack เรียกใช้งาน local.conf ได้อย่างไร ?<a class="headerlink" href="#devstack-localconf" title="Permanent link">&para;</a></h2>
+<p><img alt="" src="../images/destackflow.jpg" /></p>
+<p>DevStack เรียกใช้ <code>local.conf</code> ผ่านกลไก <strong>"source (โหลด)"</strong> เมื่อเริ่มต้น <code>stack.sh</code> ไฟล์นี้ไม่ใช่ไฟล์กำหนดค่าที่โปรแกรมแยกวิเคราะห์แบบทั่วไป แต่เป็น <strong>สคริปต์เชลล์ที่ถูก source เข้ามา</strong> ดังนั้นตัวแปรทั้งหมดที่คุณเขียนในนั้นจะถูกนำไปใช้เป็นตัวแปรสภาพแวดล้อมของสคริปต์ทันที และใช้เพื่อ override ค่าเริ่มต้นใน DevStack</p>
+<h3 id="_4">🔄 ลำดับการโหลดและตำแหน่งไฟล์<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>ตำแหน่งไฟล์</strong>: ไฟล์ <code>local.conf</code> จะต้องวางไว้ใน<strong>ไดเรกทอรีรากของ DevStack</strong> (เช่น <code>~/devstack/local.conf</code>) จึงจะสามารถเรียกใช้ได้อย่างถูกต้อง</li>
+<li><strong>จุดเข้าโหลด</strong>: เมื่อคุณรัน <code>./stack.sh</code> สคริปต์จะโหลด <code>stackrc</code> ก่อน ในขั้นตอนนี้ <code>stackrc</code> จะทำการ <strong>source</strong> ไฟล์ <code>local.conf</code> โดยอัตโนมัติ</li>
+<li><strong>กลไกการ override</strong>: เนื่องจากเป็นการโหลดแบบ source ตัวแปรที่คุณกำหนดใน <code>local.conf</code> (เช่น <code>HOST_IP</code>, <code>ADMIN_PASSWORD</code>) จะ<strong>แทนที่</strong>ค่าเริ่มต้นที่กำหนดไว้ล่วงหน้าใน <code>stackrc</code> หรือสคริปต์อื่นๆ โดยตรง</li>
+</ol>
+<h3 id="_5">📝 กฎไวยากรณ์สำคัญ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>เนื่องจากมันถูกประมวลผลเป็นสคริปต์เชลล์ จึงต้องปฏิบัติตามไวยากรณ์ของเชลล์อย่างเคร่งครัด:
+*   <strong>ห้ามมีช่องว่าง</strong>: เครื่องหมายเท่ากับ <code>=</code> ทั้งสองด้าน<strong>ห้ามมีช่องว่าง</strong> ตัวอย่างเช่น ต้องเขียนเป็น <code>HOST_IP=10.20.30.11</code> ไม่สามารถเขียนเป็น <code>HOST_IP = 10.20.30.11</code>
+*   <strong>หัวข้อพิเศษ</strong>: <code>[[local|localrc]]</code> ที่จุดเริ่มต้นไฟล์คือส่วนหัวพิเศษที่บอกให้ DevStack รู้ว่าส่วนนี้คือการกำหนดค่าแบบ local ที่ต้องโหลดก่อน จากนั้นเนื้อหาที่ตามมาจะถูกดำเนินการเหมือนสคริปต์เชลล์</p>
+<p>พูดง่ายๆ คือ <code>stack.sh</code> เมื่อเริ่มต้นจะ "อ่าน" ไฟล์ <code>local.conf</code> ราวกับกำลังรันสคริปต์ เพื่อให้การกำหนดค่าของคุณมีผลตั้งแต่เริ่มต้น</p>
+<h2 id="step-4-devstack">Step 4: รันคำสั่งติดตั้ง DevStack<a class="headerlink" href="#step-4-devstack" title="Permanent link">&para;</a></h2>
+<ul>
+<li>ใช้ Tmux มาช่วย ในการ monitor
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>tmux
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>devstack
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># เปิดใช้งานรีพอสิทอรี messaging ของ CentOS Stream 9</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>centos-release-rabbitmq-38
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="c1"># หรือลองติดตั้งโดยตรง</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>rabbitmq-server
+</span></code></pre></div></li>
+</ul>
+<h2 id="step">Step คำสั่งที่ใช้<a class="headerlink" href="#step" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cd ~/devstack
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a># 1. หยุด service ที่ค้าง (ถ้ามี)
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>./unstack.sh 2&gt;/dev/null
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a># 2. ล้าง state
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>./clean.sh 2&gt;/dev/null
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a># 3. ล้าง pip cache (กันปัญหา dependency ค้างจากรอบก่อน)
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>sudo -H python3.11 -m pip cache purge
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a># 4. รัน stack ใหม่
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>./stack.sh 2&gt;&amp;1 | tee /tmp/stack-install.log
+</span></code></pre></div>
+<p>การติดตั้งจะใช้เวลา <strong>30–90 นาที</strong> ขึ้นอยู่กับความเร็วอินเทอร์เน็ตและฮาร์ดแวร์  โดย Stack.sh จะเริ่มจากติดตั้ง Repository ที่จำเป็นต้องใช้ ให้เราเอง อัตโนมัต และ จำทำการติดตั้ง service</p>
+<p>หากสำเร็จ จะแสดงข้อความคล้ายกับนี้:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>=========================
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>DevStack Component Timing
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>=========================
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Total runtime: 2847 seconds
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>...
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>This is your host IP address: 10.20.30.11
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>This is your host IPv6 address: ::1
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>Horizon is now available at http://10.20.30.11/dashboard
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>Keystone is serving at http://10.20.30.11/identity/
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>The default users are: admin and demo
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>The password: Muict@2024
+</span></code></pre></div>
+<h2 id="_6">กรณีที่รันซ้ำได้ปลอดภัย<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>DevStack ออกแบบมาให้ทำงานซ้ำได้ (idempotent ในหลายขั้นตอน) เช่น ถ้า git clone มีอยู่แล้วจะข้าม, database มีอยู่แล้วจะไม่สร้างใหม่</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a># Edit local.conf
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>vim local.conf
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a># Run 
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>./unstack.sh
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>./stack.sh
+</span></code></pre></div>
+<h3 id="_7">🧹 คำสั่งที่ควรรู้<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>คำสั่ง</th>
+<th>ผลลัพธ์</th>
+<th>ใช้เมื่อ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>./unstack.sh</code></td>
+<td>หยุด services, ลบ screen, ล้าง network บางส่วน</td>
+<td>แก้ config แล้วอยากเริ่มใหม่</td>
+</tr>
+<tr>
+<td><code>./unstack.sh --all</code></td>
+<td>เหมือนข้างบน + ล้าง volume/data ด้วย</td>
+<td>อยากเริ่มสะอาดกว่า</td>
+</tr>
+<tr>
+<td><code>./clean.sh</code></td>
+<td>ลบ database, state, volume ทั้งหมด</td>
+<td>stack พังหนัก แก้ไม่หาย</td>
+</tr>
+<tr>
+<td><code>./stack.sh</code></td>
+<td>ติดตั้ง/เริ่ม services</td>
+<td>ติดตั้งครั้งแรก หรือหลัง unstack/clean</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>หน้าที่ สคริปต์หลักทั้ง 3 ตัวใน DevStack มีหน้าที่และการทำงานที่แตกต่างกันดังนี้ครับ:</p>
+<ul>
+<li><strong><code>unstack.sh</code></strong>: ใช้สำหรับ <strong>หยุด (Stop)</strong> การทำงานของเซอร์วิสและโพรเซสทั้งหมดของ OpenStack และ DevStack ที่กำลังรันอยู่ แต่ยังคงเก็บข้อมูลตั้งค่า, ฐานข้อมูล และไฟล์ต่างๆ ไว้เหมือนเดิม</li>
+<li><strong><code>stack.sh</code></strong>: ใช้สำหรับ <strong>ติดตั้งและเริ่มการทำงาน (Start/Deploy)</strong> เซอร์วิสทั้งหมดของ OpenStack ตามไฟล์คอนฟิก <code>local.conf</code> ที่คุณกำหนดไว้</li>
+<li><strong><code>clean.sh</code></strong>: ใช้สำหรับ <strong>ลบและล้างข้อมูลทั้งหมด (Clean/Purge)</strong> ที่ DevStack เคยสร้างขึ้นมา เช่น ฐานข้อมูลทั้งหมด, โฟลเดอร์ข้อมูลใน <code>/opt/stack</code>, บริดจ์เน็ตเวิร์ก (เช่น <code>br-ex</code>) และอิมเมจ เพื่อเคลียร์ระบบให้กลับมาเหมือนก่อนติดตั้งใหม่ตั้งแต่ต้น (เสมือนรีเซ็ตระบบให้สะอาดหมดจด)</li>
+</ul>
+<hr />
+<h3 id="_8">หากมีการเปิด ปิดเครื่อง<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<ul>
+<li>สั่งรันสคริปต์เดิมซ้ำเพื่อปลุกเซอร์วิสและเน็ตเวิร์กทั้งหมดของ OpenStack ขึ้นมาใหม่:</li>
+</ul>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>cd /opt/stack/devstack
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a># ก่อนปิดเครื่อง
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>./unstack.sh
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a># เมื่อเปิดเครื่อง
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>./stack.sh
+</span></code></pre></div>
+- Verification: รอจนกระทั่งสคริปต์ทำงานเสร็จสิ้น จะแสดงข้อความสรุปพร้อมลิงก์เข้าสู่หน้าเว็บ Horizon Dashboard และข้อมูล Endpoint</p>
+<div class="admonition info">
+<p class="admonition-title">ข้อควรระวังเรื่อง IP Address</p>
+<p>หากเครื่องคอมพิวเตอร์ของคุณเชื่อมต่อผ่าน DHCP และได้รับ IP Address ใหม่ (ซึ่งจะทำให้ค่า HOST_IP ที่เคยตั้งไว้ใน local.conf ไม่ตรงกับ IP ปัจจุบัน) การรัน ./stack.sh อาจเกิดข้อผิดพลาดได้ แนะนำให้ตรวจสอบ IP ของเครื่องด้วยคำสั่ง ip a ก่อนทุกครั้งว่ายังคงตรงกับค่า HOST_IP ที่ตั้งไว้หรือไม่</p>
+</div>
+<h2 id="step-5">Step 5: ตรวจสอบการติดตั้ง<a class="headerlink" href="#step-5" title="Permanent link">&para;</a></h2>
+<h3 id="credentials">โหลด Credentials<a class="headerlink" href="#credentials" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/stack/devstack
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nb">source</span><span class="w"> </span>openrc<span class="w"> </span>admin<span class="w"> </span>
+</span></code></pre></div>
+<h3 id="_9">ตรวจสอบบริการต่าง ๆ<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Python API &amp; SDK (วิธีที่นักพัฒนาเรียกใช้งาน OpenStack) ในการเขียนโปรแกรมคุยกับ OpenStack หรือแกะโค้ดส่วนที่เป็น Client SDK นักพัฒนาจะใช้เครื่องมือหลัก python-openstackclient  (Openstack CLI)  ทำให้สามารถใช้ คำสั่ง openstack ต่างๆ ได้</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># รายการบริการ Compute</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>openstack<span class="w"> </span>compute<span class="w"> </span>service<span class="w"> </span>list
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># รายการ Network Agent</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>openstack<span class="w"> </span>network<span class="w"> </span>agent<span class="w"> </span>list
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># รายการ VM (ควรว่าง)</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>openstack<span class="w"> </span>server<span class="w"> </span>list
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1"># รายการรูปแบบ (Flavors)</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>openstack<span class="w"> </span>flavor<span class="w"> </span>list
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="c1"># รายการรูป VM (Images)</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>openstack<span class="w"> </span>image<span class="w"> </span>list
+</span></code></pre></div>
+<h3 id="horizon-dashboard">ตรวจสอบ Horizon Dashboard<a class="headerlink" href="#horizon-dashboard" title="Permanent link">&para;</a></h3>
+<p>เปิดเว็บเบราว์เซอร์บนเครื่อง Host (Windows) และเข้าไปที่:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>http://10.20.30.11/dashboard
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>ช่อง</th>
+<th>ค่า</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Domain</td>
+<td><code>default</code></td>
+</tr>
+<tr>
+<td>User Name</td>
+<td><code>admin</code></td>
+</tr>
+<tr>
+<td>Password</td>
+<td><code>Muict@2024</code> (หรือ ADMIN_PASSWORD ที่ตั้งไว้)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="step-6-vm-cli">Step 6: สร้าง VM ตัวแรกผ่าน CLI<a class="headerlink" href="#step-6-vm-cli" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># โหลด credentials ของ demo user</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">source</span><span class="w"> </span>/opt/stack/devstack/openrc<span class="w"> </span>demo<span class="w"> </span>demo
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># สร้าง Keypair</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>rsa<span class="w"> </span>-f<span class="w"> </span>~/.ssh/devstack_key<span class="w"> </span>-N<span class="w"> </span><span class="s2">""</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>openstack<span class="w"> </span>keypair<span class="w"> </span>create<span class="w"> </span>--public-key<span class="w"> </span>~/.ssh/devstack_key.pub<span class="w"> </span>devstack_key
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c1"># เปิด Security Group สำหรับ SSH</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>openstack<span class="w"> </span>security<span class="w"> </span>group<span class="w"> </span>rule<span class="w"> </span>create<span class="w"> </span>--protocol<span class="w"> </span>tcp<span class="w"> </span>--dst-port<span class="w"> </span><span class="m">22</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">  </span>--remote-ip<span class="w"> </span><span class="m">0</span>.0.0.0/0<span class="w"> </span>default
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="c1"># สร้าง VM</span>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>openstack<span class="w"> </span>server<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">  </span>--image<span class="w"> </span>cirros-0.6.2-x86_64-disk<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="w">  </span>--flavor<span class="w"> </span>m1.tiny<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="w">  </span>--network<span class="w"> </span>private<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="w">  </span>--key-name<span class="w"> </span>devstack_key<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-18"><a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="w">  </span>--security-group<span class="w"> </span>default<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-19"><a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="w">  </span>--wait<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-20"><a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="w">  </span>vm-01
+</span><span id="__span-17-21"><a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>
+</span><span id="__span-17-22"><a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="c1"># ตรวจสอบสถานะ</span>
+</span><span id="__span-17-23"><a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>openstack<span class="w"> </span>server<span class="w"> </span>list
+</span></code></pre></div>
+<hr />
+<h2 id="_10">ปัญหาที่พบบ่อย<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>ปัญหา</th>
+<th>วิธีแก้ไข</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stack.sh</code> ล้มเหลว มีข้อผิดพลาดเกี่ยวกับ apt</td>
+<td>CentOS ใช้ <code>dnf</code> ไม่ใช่ <code>apt</code> — DevStack รองรับอัตโนมัติ แต่ตรวจสอบว่ามีอินเทอร์เน็ต</td>
+</tr>
+<tr>
+<td>หน่วยความจำไม่พอ OOM</td>
+<td>เพิ่ม RAM VM เป็น 12-16 GB หรือเพิ่ม Swap</td>
+</tr>
+<tr>
+<td>เครือข่ายไม่สามารถเชื่อมต่อได้</td>
+<td>ตรวจสอบ <code>HOST_IP</code> และ <code>FLAT_INTERFACE</code> ใน local.conf</td>
+</tr>
+<tr>
+<td>ติดตั้งไม่สำเร็จ</td>
+<td>รัน <code>./unstack.sh &amp;&amp; ./stack.sh</code> อีกครั้ง</td>
+</tr>
+<tr>
+<td>Neutron agent รายงาน XXX</td>
+<td>ตรวจสอบว่า eth2 (FLAT_INTERFACE) อยู่ใน state UP</td>
+</tr>
+<tr>
+<td>ไม่สามารถเข้า Horizon ได้</td>
+<td>ตรวจสอบ firewall — <code>sudo systemctl status firewalld</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="ovn-open-virtual-network">การเปลี่ยนผ่านสู่ OVN (Open Virtual Network):<a class="headerlink" href="#ovn-open-virtual-network" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Exclude q-get,q-l3</li>
+</ul>
+<p><img alt="" src="../images/ovn_diagrame.jpg" /></p>
+<ul>
+<li>
+<p>ในเวอร์ชันปัจจุบันของ DevStack และ Neutron ค่าเริ่มต้นของการทำระบบเน็ตเวิร์กได้เปลี่ยนมาใช้ OVN เป็น Backend หลักแทนสถาปัตยกรรม Open vSwitch (OVS) แบบดั้งเดิม</p>
+</li>
+<li>
+<p>OVN จะควบคุมการทำ Virtual Networking ผ่าน ovn-controller และ ovn-northd ในตัวอยู่แล้ว</p>
+</li>
+<li>เซอร์วิส q-agt (neutron-openvswitch-agent) ทำหน้าที่ควบคุม OVS แบบเก่า ซึ่งการทำงานจะชนและทับซ้อนกับระบบ OVN ที่ถูกเปิดใช้งานขึ้นมาพร้อมกัน</li>
+<li>
+<p>เมื่อเราปิดการใช้งาน q-l3 (Neutron L3 Agent) ในสถาปัตยกรรม OVN งานด้าน Layer 3 (เช่น การทำ Routing, Floating IP, และ Distributed Virtual Routing - DVR) ทั้งหมดจะถูกโอนย้ายไปให้ OVN (Open Virtual Network) เป็นผู้จัดการโดยอัตโนมัติที่ระดับล่าง (Kernel/Datapath) ผ่าน ovn-controller แทนครับ</p>
+</li>
+<li>
+<p>คุณไม่จำเป็นต้องสร้าง L3 Agent แบบดั้งเดิมขึ้นมาใหม่ เนื่องจากระบบ OVN ได้ฝังฟังก์ชันการทำงานเหล่านี้ไว้ในสถาปัตยกรรมภายในเรียบร้อยแล้ว</p>
+</li>
+<li>
+<p>ตรวจสอบว่าเซอร์วิสที่เกี่ยวข้องกับ OVN ทำงานครบถ้วนหรือไม่ด้วยคำสั่ง:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo systemctl status devstack@q-ovn-metadata-agent devstack@ovn-controller
+</span></code></pre></div></p>
+</li>
+</ul>
+<h3 id="ovn-management-plan-control-plan">OVN management plan และ Control plan<a class="headerlink" href="#ovn-management-plan-control-plan" title="Permanent link">&para;</a></h3>
+<p><img alt="" src="../images/ovn_management_plan.jpg" /></p>
+<p>สรุปสถาปัตยกรรมของ <strong>OVN (Open Virtual Network)</strong> ในส่วนของ <strong>Management Plane</strong> และ <strong>Control Plane</strong> เพื่อให้เข้าใจบทบาทและการทำงานร่วมกับ OpenStack ได้อย่างชัดเจนครับ:</p>
+<hr />
+<h3 id="1-ovn-management-plane">1. OVN Management Plane (ระดับการจัดการและกำหนดนโยบาย)<a class="headerlink" href="#1-ovn-management-plane" title="Permanent link">&para;</a></h3>
+<p>Management Plane ทำหน้าที่รับคำสั่งจากผู้ดูแลระบบหรือ OpenStack API แล้วแปลงให้เป็นโครงสร้างข้อมูลเน็ตเวิร์กเชิงตรรกะ (Logical Networks)</p>
+<ul>
+<li><strong>OpenStack Neutron (ML2/OVN Driver):</strong> ทำหน้าที่รับคำสั่ง REST API จากผู้ใช้ (เช่น สั่งสร้าง Network, Router, Subnet) แล้วบันทึกลงไปในฐานข้อมูลกลาง</li>
+<li><strong>OVN Northbound DB (NB DB):</strong> ฐานข้อมูลที่เก็บข้อมูลเน็ตเวิร์กในมุมมองเชิงตรรกะ (Logical Switch, Logical Router, Port, ACL) โดยไม่สนใจว่าโครงสร้างฮาร์ดแวร์เบื้องหลังจะเป็นอย่างไร</li>
+<li><strong><code>ovn-northd</code> (Daemon ตัวกลาง):</strong> ทำหน้าที่เป็นสะพานเชื่อมและตัวแปลภาษา คอยอ่านข้อมูลจาก Northbound DB มาประมวลผล แล้วแปลงย่อส่วนลงไปเก็บบันทึกไว้ใน Southbound DB เพื่อให้ฝั่ง Control Plane นำไปใช้งานต่อ</li>
+</ul>
+<hr />
+<h3 id="2-ovn-control-plane">2. OVN Control Plane (ระดับควบคุมและสั่งการ)<a class="headerlink" href="#2-ovn-control-plane" title="Permanent link">&para;</a></h3>
+<p>Control Plane ทำหน้าที่กระจายและแปลนโยบายเชิงตรรกะให้กลายเป็นกฎการส่งข้อมูลจริงบนโหนดประมวลผล (Compute Nodes) แต่ละเครื่อง</p>
+<ul>
+<li><strong>OVN Southbound DB (SB DB):</strong> ฐานข้อมูลศูนย์กลางที่เก็บสถานะทางกายภาพทั้งหมด เช่น รายชื่อเครื่อง Compute Node (Chassis) ที่มีอยู่, การผูกพอร์ตของ VM เข้ากับโหนดไหน, และ Logical Flows ที่ถูกแปลมาแล้ว</li>
+<li><strong><code>ovn-controller</code> (Daemon ประจำโหนด):</strong></li>
+<li>เป็นเซอร์วิสที่จะรันอยู่บนทุก Compute Node คอยเฝ้าฟังความเปลี่ยนแปลงจาก Southbound DB</li>
+<li>ทำหน้าที่แปลง Logical Flows ให้กลายเป็นกฎ OpenFlow และสั่งการไปยัง <strong>Open vSwitch (OVS)</strong> บนเครื่องนั้นๆ ให้จัดการเส้นทางแพ็กเกจข้อมูล</li>
+</ul>
+<hr />
+<h3 id="flow">สรุปภาพรวมการทำงาน (Flow)<a class="headerlink" href="#flow" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>User / OpenStack API</strong> สั่งสร้างเครือข่ายผ่าน Neutron</li>
+<li>ข้อมูลถูกบันทึกที่ <strong>Northbound DB</strong></li>
+<li><strong><code>ovn-northd</code></strong> แปลงข้อมูลแล้วส่งต่อไปยัง <strong>Southbound DB</strong></li>
+<li><strong><code>ovn-controller</code></strong> บนแต่ละ Compute Node ดึงข้อมูลจาก Southbound DB ไปสั่งงาน <strong>OVS</strong> ให้เปิดช่องทางรับส่งแพ็กเกจข้อมูลระหว่าง Virtual Machines (VMs) ได้อย่างแม่นยำและรวดเร็วโดยไม่ต้องพึ่งพา Agent แบบเดิม (<code>q-agt</code>, <code>q-l3</code>) อีกต่อไป</li>
+</ol>
+<hr />
+<h2 id="_11">การล้างข้อมูลและเริ่มใหม่<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/stack/devstack
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>./unstack.sh<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>./clean.sh<span class="w"> </span><span class="m">2</span>&gt;/dev/null
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>./stack.sh<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>/tmp/stack-install.log
+</span></code></pre></div>
+<p>หากต้องการเริ่มต้นใหม่ทั้งหมด แนะนำให้ <strong>Restore Snapshot</strong> จาก Hyper-V Manager แทน:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Hyper-V Manager → คลิกขวาที่ VM → Restore → เลือก "Clean CentOS Stream 10"
+</span></code></pre></div>
+<hr />
+<h2 id="_12">สรุปการตั้งค่าเครือข่าย<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>อินเทอร์เฟซ</th>
+<th>Virtual Switch</th>
+<th>IP</th>
+<th>บทบาทใน OpenStack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eth0</td>
+<td>DefaultSwitch</td>
+<td>DHCP</td>
+<td>อินเทอร์เน็ต/ดาวน์โหลด</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td>Internal-Mgmt</td>
+<td>10.20.30.11</td>
+<td>Horizon/API, HOST_IP</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td>Internal-BrEx</td>
+<td>192.168.56.11</td>
+<td>br-ex, Floating IPs</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>สคริปต์ของ DevStack จะสร้างและผูก <code>br-ex</code> (External Bridge) เพื่อทำหน้าที่เป็นสะพานเชื่อมระหว่างโครงสร้างเครือข่ายเสมือนของ OpenStack (เช่น VMs) กับโครงสร้างเครือข่ายภายนอก (Physical Network / Internet) ครับ</p>
+<h3 id="script-br-ex">ขั้นตอนการทำงานเบื้องหลังของ Script เมื่อสร้าง <code>br-ex</code><a class="headerlink" href="#script-br-ex" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>สร้าง Open vSwitch Bridge (<code>br-ex</code>):</strong></li>
+<li>
+<p>สคริปต์จะใช้คำสั่งของ Open vSwitch เพื่อสร้าง Virtual Bridge ขึ้นมาในระบบ ลีนุกซ์ (เช่นเดียวกับการสร้างสวิตช์เสมือน)</p>
+</li>
+<li>
+<p><strong>เชื่อมต่อ Physical Interface (<code>eth2</code>):</strong></p>
+</li>
+<li>
+<p>สคริปต์จะนำอินเทอร์เฟซจริงของเครื่อง (ตามที่คุณกำหนดใน <code>local.conf</code> เช่น <code>FLAT_INTERFACE=eth2</code>) มาผูกเข้ากับ <code>br-ex</code> ทำให้พอร์ตจริงกลายเป็นส่วนหนึ่งของบริดจ์นี้</p>
+</li>
+<li>
+<p><strong>กำหนด IP และ Routing (จุดที่เกิดปัญหา):</strong></p>
+</li>
+<li>ระบบเน็ตเวิร์กของลินุกซ์หรือสคริปต์บางตัว อาจพยายามกำหนด IP Address หรือสร้าง **Default Route ผ่านบริดจ์ <code>br-ex**</code> โดยอัตโนมัติ เพื่อให้สมมติว่าทราฟฟิกภายนอกวิ่งผ่านเส้นทางนี้</li>
+<li><strong>ผลกระทบ:</strong> ทำให้เกตเวย์หลักของเครื่องที่เคยออกอินเทอร์เน็ตผ่าน <code>eth0</code> ถูกทับด้วยเกตเวย์ของ <code>br-ex</code> ทำให้เครื่องหลุดจากการเชื่อมต่ออินเทอร์เน็ตภายนอก (เหตุผลที่เราต้องใช้คำสั่ง <code>sudo ip route del default dev br-ex</code> เพื่อดึงเส้นทางกลับมาที่ <code>eth0</code> ครับ)</li>
+</ol>
+<div class="admonition homework">
+<p class="admonition-title"><img alt="📋" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f4cb.svg" title=":clipboard:" /> การบ้าน</p>
+<p>📋 <strong>รายงานการทดลอง:</strong></p>
+<ol>
+<li>Screenshot หน้า Horizon Dashboard หลังจากเข้าสู่ระบบสำเร็จ</li>
+<li>Screenshot รายการ <code>openstack compute service list</code></li>
+<li>Screenshot รายการ <code>openstack network agent list</code></li>
+<li>Screenshot <code>openstack server list</code> แสดง vm-01 กำลังทำงาน</li>
+<li>ตอบคำถาม: <code>HOST_IP</code> ใน <code>local.conf</code> มีหน้าที่อะไร?</li>
+<li>ตอบคำถาม: ทำไมต้องมี 2 อินเทอร์เฟซแยกกัน (Mgmt vs External)?</li>
+</ol>
+<p>ส่งผ่าน: [Google Classroom / LMS]</p>
+</div>
+<h2 id="note-listnetwork">Note : Listnetwork<a class="headerlink" href="#note-listnetwork" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>PS C:\Users\sysadmin&gt; Get-VMSwitch | Select Name, SwitchType, NetAdapterInterfaceDescription
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>Name              SwitchType NetAdapterInterfaceDescription
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>----              ---------- ------------------------------
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>Default Switch      Internal
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>Internal-Mgmt-Net   Internal
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>Internal-BrEx-Net   Internal
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>WSL (Hyper-V f...   Internal
+</span></code></pre></div>
+<h2 id="virtual-switch-lab">สร้าง  virtual switch ในเครื่อง lab<a class="headerlink" href="#virtual-switch-lab" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a># ============================================
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a># สร้าง Virtual Switch สำหรับ OpenStack Lab
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a># รันใน PowerShell แบบ Administrator
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a># ============================================
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a># 1. ดูการ์ดเครือข่ายจริงก่อน (จดชื่อไว้)
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>Get-NetAdapter | Select Name, InterfaceDescription, Status
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a># 2. สร้างสวิตช์ management (Internal) — สำหรับ eth0, eth1
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>New-VMSwitch -Name "Internal-Mgmt-Net" -SwitchType Internal
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a># 3. สร้างสวิตช์ br-ex (Internal) — สำหรับ eth2
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>New-VMSwitch -Name "Internal-BrEx-Net" -SwitchType Internal
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a># 4. ตรวจสอบว่าสร้างสำเร็จ
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>Get-VMSwitch | Select Name, SwitchType
+</span></code></pre></div>
+<h2 id="import-vm-command-line">import vm command line<a class="headerlink" href="#import-vm-command-line" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a># Import VM (แก้ path ตามจริง)
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>Import-VM -Path "D:\HyperV-Backup\ชื่อVM\Virtual Machines\XXXX.xml" -Copy -GenerateNewId
+</span></code></pre></div>
+<p>หรือผ่าน Hyper-V Manager:</p>
+<ul>
+<li>
+<p>คลิก Import Virtual Machine</p>
+</li>
+<li>
+<p>เลือกโฟลเดอร์ Export</p>
+</li>
+<li>
+<p>เลือก Copy the virtual machine (create a new unique ID)</p>
+</li>
+<li>
+<p>เลือกที่เก็บไฟล์</p>
+</li>
+<li>
+<p>ตรวจสอบ mapping สวิตช์ (ควรเจอชื่อเดียวกันอัตโนมัติ)</p>
+</li>
+</ul>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a># ดูว่า VM ผูกกับสวิตช์ถูกต้องไหม
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>Get-VMNetworkAdapter -VMName "ชื่อVM" | Select Name, SwitchName
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>ขั้นตอนก่อน Import OpenStack VM:
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>1. เปิด PowerShell (Run as Administrator)
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>2. รันคำสั่ง:
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>   New-VMSwitch -Name "Internal-Mgmt-Net" -SwitchType Internal
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>   New-VMSwitch -Name "Internal-BrEx-Net" -SwitchType Internal
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>3. ตรวจสอบ:
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>   Get-VMSwitch | Select Name, SwitchType
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>4. Import VM ผ่าน Hyper-V Manager
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a>   → เลือก "Copy the virtual machine"
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>   → mapping สวิตช์จะตรงอัตโนมัติ
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a>5. เปิด VM → ตรวจสอบ network:
+</span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>   ip a
+</span></code></pre></div>
+<p>Fix intall Centos 9 Stream
+<div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a># 1. ดูบริบทก่อน
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>sed -n '30,60p' ~/devstack/lib/rpc_backend
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a># 2. Comment ทั้ง 2 บรรทัด
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>sudo sed -i '40s/^/# /' ~/devstack/lib/rpc_backend
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>sudo sed -i '54s/^/# /' ~/devstack/lib/rpc_backend
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a># 3. ตรวจสอบ
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>sed -n '35,60p' ~/devstack/lib/rpc_backend
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a># 4. ยืนยันว่า RabbitMQ ยังอยู่ (ถ้าถูกลบไปแล้ว ให้ติดตั้งใหม่)
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a>rpm -q rabbitmq-server
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a># ถ้าไม่มี:
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a>sudo dnf install -y https://github.com/rabbitmq/rabbitmq-server/releases/download/v4.4.0/rabbitmq-server-4.4.0-1.el8.noarch.rpm
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a>sudo systemctl enable --now rabbitmq-server
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a>sleep 10
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a>sudo rabbitmqctl status
+</span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a>
+</span><span id="__span-26-19"><a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a># 5. รัน stack.sh
+</span><span id="__span-26-20"><a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a>cd ~/devstack
+</span><span id="__span-26-21"><a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a>./stack.sh 2&gt;&amp;1 | tee /tmp/stack-install.log
+</span></code></pre></div></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>source openrc admin admin
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>openstack service list
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>openstack endpoint list
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>openstack hypervisor list
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+          <div class="md-top" data-md-component="top" hidden>
+  <div class="md-top__center">
+    <button type="button" class="md-top__button md-top__button--main" data-md-action="top">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+      <span>Back to top</span>
+    </button>
+    
+      
+      
+      <label class="md-top__button md-top__side md-top__side--nav" for="__drawer" >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-panel-left" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+      </label>
+    
+    
+      
+      
+      <label class="md-top__button md-top__side md-top__side--toc" for="__toc" >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-panel-right" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg>
+      </label>
+    
+  </div>
+</div>
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/itbcodedev" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+          
+          
+        
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "code": null, "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": {"options": {"baseUrl": "../..", "bundleUrl": "../../search/", "highlight": true, "searchOptions": {}}, "provider": "pagefind"}, "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "code.collapse": "Collapse", "code.download": "Download", "code.expand": "Expand remaining # lines", "code.select": "Toggle line selection", "search.offline": "Switch to Lunr for offline search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.19ace10b.min.js"></script>
+      
+    
+  </body>
+</html>

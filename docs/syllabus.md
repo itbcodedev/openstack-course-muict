@@ -1,3 +1,7 @@
+---
+title: "📋 หลักสูตรรายวิชา"
+---
+
 # 📋 หลักสูตรรายวิชา
 
 ## วิชา OpenStack Cloud Computing — MUICT

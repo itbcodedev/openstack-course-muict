@@ -1,8 +1,12 @@
-# การทดลองที่ 0: ติดตั้ง CentOS Stream 10 บน Hyper-V
+---
+title: "การทดลองที่ 0: ติดตั้ง CentOS Stream 9 บน Hyper-V"
+---
+
+# การทดลองที่ 0: ติดตั้ง CentOS Stream 9 บน Hyper-V
 
 ## วัตถุประสงค์
 
-ติดตั้งระบบปฏิบัติการ CentOS Stream 10 ลงบน Virtual Machine โดยใช้ Hyper-V บน Windows เพื่อเป็นเครื่องมือสำหรับติดตั้ง OpenStack ด้วย DevStack ในภายหลัง
+ติดตั้งระบบปฏิบัติการ CentOS Stream 9 ลงบน Virtual Machine โดยใช้ Hyper-V บน Windows เพื่อเป็นเครื่องมือสำหรับติดตั้ง OpenStack ด้วย DevStack ในภายหลัง
 
 ---
 
@@ -19,16 +23,21 @@
 | access ip |  172.24.90.184  |
 ---
 
-## สร้าง Virtual Switch บน Hyper-V
+## วิธีการ สร้าง Virtual Switch บน Hyper-V
 
-ก่อนสร้าง VM ให้สร้าง Virtual Switch ทั้งหมด 3 ตัวบน Hyper-V Manager:
+![](./images/lab00-1-1.png)
+
+!!! note
+    ก่อนสร้าง VM ให้สร้าง Virtual Switch ทั้งหมด 3 ตัวบน Hyper-V Manager: โดยการสร้าง จะสร้างเป็น internal network ดังนั้น VM แต่ละตัวที่ที่เชื่อมต่อกัน บน Virtual network จะ เป็นสือสารใน  layer 2 หรือ ใช้ mac address.  internel network จะไม่ได้มี dhcp server ดังนั้น จึงต้อง เรียนรู้การ Fix ip หรือการตั้งค่าให้เป็น static ip
+    1. Internal-Mgmt-Net
+    2. Internal-BrEx-Net
 
 ![](./images/lab00-1.png)
 
-***Figure 1 กดปุม ทางขวา มือ Virtual Switch Manager สร้าง internal switch ทำหน้าการเชื่อมต่อ ใน layer 2 , และไม่มี DHCP Server เพื่อให้มีการร้องขอ ip ต้องกำหนดเอง***
+Figure 1 กดปุม ทางขวา มือ Virtual Switch Manager สร้าง internal switch ทำหน้าการเชื่อมต่อ ใน layer 2 , และไม่มี DHCP Server เพื่อให้มีการร้องขอ ip ต้องกำหนดเอง
 
 ![](./images/lab00-2.png)
-***Figure 2 สร้าง Internal Virtual Switch จะสร้าง 2 Switch คือ Internal-Mgmt-Net และ Internal-BrEx-Net***
+Figure 2 สร้าง Internal Virtual Switch จะสร้าง 2 Switch คือ Internal-Mgmt-Net และ Internal-BrEx-Net
 
 ### 1. Default Switch (เชื่อมต่ออินเทอร์เน็ต)
 
@@ -45,10 +54,11 @@ Connection type: External network → [เลือกการ์ดเคร�
 
 ![](./images/lab00-3.png)
 
-***Figure 3 สร้าง  Internal-Mgmt-Net ให้ตั้งชื่อ อย่างเดียว ส่วน Note จะมีหรือไม่มีก็ได้ ไม่มีผล และให้กด Apply เพื่อเป็นการยืนยัน***
+Figure 3 สร้าง  Internal-Mgmt-Net ให้ตั้งชื่อ อย่างเดียว ส่วน Note จะมีหรือไม่มีก็ได้ ไม่มีผล และให้กด Apply เพื่อเป็นการยืนยัน
 
 
 ```
+ขั้นตอนการเลือก
 Virtual Switch Manager → New virtual network switch → Internal → Create Virtual Switch
 ชื่อ: Internal-Mgmt-Net
 Connection type: Internal network
@@ -61,9 +71,10 @@ Connection type: Internal network
 
 ![](./images/lab00-4.png)
 
-***Figure 4 สร้าง  Internal-BrEx-Net***
+Figure 4 สร้าง  Internal-BrEx-Net
 
 ```
+ขั้นตอนการเลือก
 Virtual Switch Manager → New virtual network switch → Internal → Create Virtual Switch
 ชื่อ: Internal-BrEx-Net
 Connection type: Internal network
@@ -80,7 +91,7 @@ Connection type: Internal network
 
 ---
 
-## สร้าง Virtual Machine
+## ขึ้นตอน สร้าง Virtual Machine
 
 ### ขั้นตอนที่ 1: New Virtual Machine Wizard
 
@@ -115,49 +126,27 @@ Hyper-V Manager → Action → New → Virtual Machine
 
 > **สำคัญ: ปิด Dynamic Memory —** OpenStack ต้องการหน่วยความจำคงที่ ให้ปิด Dynamic memory แล้วตั้งค่า Startup RAM = 8192 MB
 
-### ขั้นตอนที่ 2: เพิ่ม Network Adapter
+### ขั้นตอนที่ 2: ตรวจสอบ Network Adapter
 
 หลังจากสร้าง VM เสร็จ ให้เปิด **Settings** ของ VM และเพิ่ม Network Adapter อีก 2 ตัว:
 
 ![](./images/lab00-13.png)
 
 ```
+ถ้าหากยังไม่มี internal network ให้สร้างใหม่
+ลำดับการสร้าง
 Settings → Add Hardware → Network Adapter → Add
 ```
+![](./images/lab00-17-1.png)
 
-- **Network Adapter 1:** DefaultSwitch (มีอยู่แล้ว)
-- **Network Adapter 2:** Internal-Mgmt
-- **Network Adapter 3:** Internal-BrEx
-
-![](./images/lab00-14.png)
-
-![](./images/lab00-15.png)
-
-![](./images/lab00-16.png)
-
-
-รวมทั้งหมด 3 Network Adapters
+ต้องมี  network รวมทั้งหมด 3 Network Adapters ก่อนการติดตั้ง  หรือ ก่อนการ import
 ![](./images/lab00-17.png)
 
-### ขั้นตอนที่ 3: ปรับแต่งเพิ่มเติม
 
-![](./images/lab00-18.png)
-
-```
-Settings:
-├── Security
-│   └── Secure Boot: ☐ Uncheck (ปิด Secure Boot — จำเป็นสำหรับ Linux บน Gen 2)
-├── Processor
-│   └── Number of virtual processors: 8 (หรือ 4 หากมีไม่พอ)
-├── Integration Services
-│   └── ☑ Guest services (ช่วยให้ Copy-Paste ระหว่าง Host กับ VM ได้)
-└── Checkpoint File Location
-    └── กำหนดพื้นที่จัดเก็บ Snapshot
-```
 
 ---
 
-## ติดตั้ง CentOS Stream 10
+## ติดตั้ง CentOS Stream 9
 
 ### ขั้นตอนที่ 1: เปิดเครื่อง VM
 

@@ -1,3 +1,7 @@
+---
+title: "การบรรยายที่ 1: บทนำสู่ Cloud Computing และ OpenStack"
+---
+
 # การบรรยายที่ 1: บทนำสู่ Cloud Computing และ OpenStack
 
 ## วัตถุประสงค์การเรียนรู้

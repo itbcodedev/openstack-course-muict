@@ -26,6 +26,11 @@
         <changefreq>daily</changefreq>
     </url>
     <url>
+        <loc>https://itbcodedev.github.io/openstack-course-muict/labs/lab01-devstack-ubuntu/</loc>
+        <lastmod>2026-11-12</lastmod>
+        <changefreq>daily</changefreq>
+    </url>
+    <url>
         <loc>https://itbcodedev.github.io/openstack-course-muict/labs/lab01-devstack/</loc>
         <lastmod>2026-11-12</lastmod>
         <changefreq>daily</changefreq>

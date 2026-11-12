@@ -91,7 +91,8 @@ nav:
     - lectures/lecture12-troubleshooting.md
   - การทดลอง:
     - labs/lab00-centos-hyperv.md
-    - labs/lab01-devstack.md
+    - labs/lab01-devstack-centos.md
+    - labs/lab01-devstack-ubuntu.md
     - labs/lab02-horizon.md
     - labs/lab03-cli.md
   - แหล่งข้อมูล: resources.md

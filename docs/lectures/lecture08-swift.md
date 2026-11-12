@@ -1,3 +1,7 @@
+---
+title: "การบรรยายที่ 8: Swift — บริการ Object Storage"
+---
+
 # การบรรยายที่ 8: Swift — บริการ Object Storage
 
 ## วัตถุประสงค์การเรียนรู้

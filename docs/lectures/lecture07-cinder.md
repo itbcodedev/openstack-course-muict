@@ -1,3 +1,7 @@
+---
+title: "การบรรยายที่ 7: Cinder — บริการ Block Storage"
+---
+
 # การบรรยายที่ 7: Cinder — บริการ Block Storage
 
 ## วัตถุประสงค์การเรียนรู้

@@ -1,4 +1,8 @@
-# การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 10
+---
+title: "การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 9"
+---
+
+# การทดลองที่ 1: ติดตั้ง DevStack บน CentOS Stream 9
 
 ## วัตถุประสงค์
 
@@ -55,7 +59,17 @@ lsmod | grep kvm
 
 
 
-### สลับไปยังผู้ใช้ stack
+### ผู้ใช้ stack
+
+```bash
+# login gui ด้วย user  student  password  muictP@ssw0rd
+```
+
+```bash
+# เปิด terminal แล้ว สลับ user เป็น stack
+sudo -u stack -i
+```
+
 
 ![](./images/lab01-3.png)
 

@@ -1,3 +1,7 @@
+---
+title: "การบรรยายที่ 11: ติดตั้ง OpenStack ด้วย Kolla-Ansible"
+---
+
 # การบรรยายที่ 11: ติดตั้ง OpenStack ด้วย Kolla-Ansible
 
 ## วัตถุประสงค์การเรียนรู้
