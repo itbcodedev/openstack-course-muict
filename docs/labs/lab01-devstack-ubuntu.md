@@ -6,8 +6,7 @@ title: "การทดลองที่ 1: ติดตั้ง DevStack บ�
 
 ## วัตถุประสงค์
 
-ติดตั้งสภาพแวดล้อม OpenStack แบบ All-in-One บน Ubuntu 24.04 โดยใช้ DevStack บน Virtual Machine ที่สร้างจาก [Lab 0: ติดตั้ง Ubuntu 24.04 บน Hyper-V](lab00-centos-hyperv.md)
-
+ติดตั้งสภาพแวดล้อม OpenStack แบบ All-in-One บน Ubuntu 24.04 โดยใช้ DevStack บน Virtual Machine
 ---
 
 ## ข้อกำหนด
@@ -21,8 +20,111 @@ title: "การทดลองที่ 1: ติดตั้ง DevStack บ�
 | เครือข่าย | 3 adapters ตามที่ตั้งค่าใน Lab 0 |
 
 ---
+## install Opentack ด้วย Devstack
+-Souce code [https://github.com/openstack/devstack](https://github.com/openstack/devstack)
+
+![](./images/lab01-26.png)
+
+## Source code Openstack
+
+![](./images/lab01-21.png)
+เปิด [https://releases.openstack.org/](https://releases.openstack.org/)
+
+![](./images/lab01-22.png)
 
 ## Step 1: เตรียมระบบ
+เปิด [https://releases.openstack.org/hibiscus/index.html](https://releases.openstack.org/hibiscus/index.html)
+
+## Source Code ของ Project
+- Script ของ Devstack จากทำการ Download (git clone) มาไว้ที่ /opt/stack
+![](./images/lab01-23.png)
+
+ในสภาพแวดล้อมของ DevStack โค้ดต้นฉบับ (Source Code) ของทุก Service ใน OpenStack จะถูกดาวน์โหลด (git clone) มาเก็บไว้ที่โฟลเดอร์ /opt/stack/ ครับ (อยู่ระดับเดียวกับโฟลเดอร์ devstack ที่คุณเพิ่งเข้าไป)
+
+เมื่อคุณเข้าไปที่ /opt/stack/ จะพบกับโฟลเดอร์ย่อยของแต่ละ Service แยกกันอย่างชัดเจน ตัวอย่างเช่น:
+```
+/opt/stack/nova - โค้ดของ Compute Service (จัดการ VM)  
+/opt/stack/neutron - โค้ดของ Network Service (จัดการเครือข่าย)  
+/opt/stack/keystone - โค้ดของ Identity Service (จัดการการเข้าระบบและสิทธิ์)  
+/opt/stack/glance - โค้ดของ Image Service (จัดการ Image)  
+/opt/stack/horizon - โค้ดของ Dashboard (หน้าเว็บ UI)  
+/opt/stack/cinder - โค้ดของ Block Storage  
+```
+
+ตัวอย่าง การดูว่า Code nova clone จาก ที่ไหน
+```
+cd /opt/stack/nova
+git remote -v
+
+origin  https://opendev.org/openstack/nova.git (fetch)
+origin  https://opendev.org/openstack/nova.git (push)
+```
+
+![](./images/lab01-24.png)
+
+### เปิด browser ไปยัง project nova
+![](./images/lab01-25.png)
+[https://opendev.org/openstack/nova](https://opendev.org/openstack/nova)
+
+
+### การทำงาน ของ Devstack เมื่อ ต้อง Build Project
+
+ต้องทำความเข้าใจก่อนว่า Nova (และ Service ส่วนใหญ่ใน OpenStack) เขียนด้วยภาษา **Python** ดังนั้นกระบวนการ "Build" ของ DevStack จะไม่ใช่การ Compile โค้ดให้เป็นไฟล์ Execute แบบภาษา C หรือ Go แต่จะเป็นกระบวนการ **ติดตั้ง Package, จัดการ Dependencies และตั้งค่าระบบ** ครับ
+
+เมื่อ DevStack ทำการ Clone โค้ดจาก [https://opendev.org/openstack/nova](https://opendev.org/openstack/nova) มาไว้ที่ `/opt/stack/nova` แล้ว เบื้องหลัง DevStack จะทำงานตามขั้นตอนดังนี้ครับ:
+
+### 1. ติดตั้งแบบ Editable Mode (Develop Mode)
+
+DevStack จะรันคำสั่งที่เทียบเท่ากับ `pip install -e /opt/stack/nova` (ในสคริปต์ของ DevStack จะใช้ฟังก์ชันที่ชื่อว่า `setup_develop`)
+
+* **ข้อดี:** การติดตั้งแบบ `-e` (Editable) ทำให้ตัว Python ของระบบ (หรือ Virtual Environment) ชี้มาที่โฟลเดอร์ `/opt/stack/nova` โดยตรง
+* **ผลลัพธ์:** หากคุณแก้ไข Source Code ในโฟลเดอร์นี้ โค้ดที่แก้จะมีผลทันทีโดยไม่ต้องสั่ง Build หรือ Install ใหม่ (เพียงแค่ Restart Service)
+
+### 2. ติดตั้ง Dependencies
+
+DevStack จะอ่านไฟล์ `requirements.txt` และ `setup.cfg` (หรือ `pyproject.toml`) ที่อยู่ในโฟลเดอร์ Nova เพื่อดาวน์โหลดและติดตั้งไลบรารีของ Python ที่ Nova จำเป็นต้องใช้ในการทำงาน
+
+### 3. สร้างไฟล์ Configuration
+
+DevStack จะดึงค่าต่างๆ ที่เราตั้งไว้ใน `local.conf` ไปผสมกับค่า Default แล้วสร้างไฟล์คอนฟิกหลักของ Nova ไปวางไว้ที่ `/etc/nova/nova.conf`
+
+### 4. สร้างและ Sync ฐานข้อมูล (DB Sync)
+
+DevStack จะรันคำสั่งของ Nova เพื่อสร้างตารางในฐานข้อมูล (MariaDB) เช่น:
+
+* `nova-manage api_db sync`
+* `nova-manage db sync`
+
+### 5. รัน Service ผ่าน Systemd
+
+เมื่อตั้งค่าทุกอย่างเสร็จ DevStack จะใช้ `systemd` ของ Ubuntu ในการรัน Service ย่อยต่างๆ ของ Nova ขึ้นมา (เช่น `nova-api`, `nova-compute`, `nova-scheduler`) โดยจะตั้งชื่อ Service นำหน้าด้วย `devstack@`
+
+---
+
+### อยากดูว่า DevStack สั่ง Build/Install ตรงไหน?
+
+สคริปต์ที่เป็น "สูตร" ในการติดตั้ง Nova ของ DevStack จะถูกเก็บแยกไว้ในไฟล์นี้ครับ:
+**`/opt/stack/devstack/lib/nova`**
+
+หากคุณใช้ `cat` หรือ `nano` เปิดไฟล์นี้ดู จะพบฟังก์ชัน Bash เช่น `install_nova()`, `configure_nova()`, `start_nova()` ซึ่งเป็นตัวกำหนดว่า DevStack จะทำอะไรกับ Source Code ที่โคลนมาบ้าง
+
+### วิธีแก้ไขโค้ดและทดสอบ (Developer Workflow)
+
+หากคุณต้องการแก้โค้ดของ Nova บน DevStack ระบบนี้ออกแบบมาให้ทำได้ง่ายมากครับ:
+
+1. **แก้ไขโค้ด:** แก้ไขไฟล์ Python ใน `/opt/stack/nova/`
+2. **Restart Service:** หาว่าโค้ดที่คุณแก้กระทบกับ Service ตัวไหน แล้วสั่ง Restart ผ่าน systemctl ของ Ubuntu ตัวอย่างเช่น หากแก้โค้ดส่วนของ Compute Node ให้รัน:
+```bash
+sudo systemctl restart devstack@nova-compute.service
+
+```
+
+
+3. **ดู Log:** ตรวจสอบว่าโค้ดใหม่ทำงานถูกต้องหรือไม่ (หรือมี Error พังไปแล้ว) โดยดู Log สดๆ ด้วยคำสั่ง:
+```bash
+sudo journalctl -u devstack@nova-compute.service -f
+
+```
 
 ### Powershell Administrator
 - เปิดการใช้งาน  Nested Hyper-V virtualization เพื่อให้ VM เข้าถึงชั้นของ Hypervisor ได้โดยตรง จำเป็นต้องทำ
@@ -280,22 +382,17 @@ DevStack เรียกใช้ `local.conf` ผ่านกลไก **"sourc
 
 ### 📝 กฎไวยากรณ์สำคัญ
 
-เนื่องจากมันถูกประมวลผลเป็นสคริปต์เชลล์ จึงต้องปฏิบัติตามไวยากรณ์ของเชลล์อย่างเคร่งครัด:
-*   **ห้ามมีช่องว่าง**: เครื่องหมายเท่ากับ `=` ทั้งสองด้าน**ห้ามมีช่องว่าง** ตัวอย่างเช่น ต้องเขียนเป็น `HOST_IP=10.20.30.11` ไม่สามารถเขียนเป็น `HOST_IP = 10.20.30.11`
-*   **หัวข้อพิเศษ**: `[[local|localrc]]` ที่จุดเริ่มต้นไฟล์คือส่วนหัวพิเศษที่บอกให้ DevStack รู้ว่าส่วนนี้คือการกำหนดค่าแบบ local ที่ต้องโหลดก่อน จากนั้นเนื้อหาที่ตามมาจะถูกดำเนินการเหมือนสคริปต์เชลล์
+เนื่องจากมันถูกประมวลผลเป็นสคริปต์เชลล์ จึงต้องปฏิบัติตามไวยากรณ์ของเชลล์อย่างเคร่งครัด:  
+- **ห้ามมีช่องว่าง**: เครื่องหมายเท่ากับ `=` ทั้งสองด้าน**ห้ามมีช่องว่าง** ตัวอย่างเช่น ต้องเขียนเป็น `HOST_IP=10.20.30.11` ไม่สามารถเขียนเป็น `HOST_IP = 10.20.30.11`  
+- **หัวข้อพิเศษ**: `[[local|localrc]]` ที่จุดเริ่มต้นไฟล์คือส่วนหัวพิเศษที่บอกให้ DevStack   รู้ว่าส่วนนี้คือการกำหนดค่าแบบ local ที่ต้องโหลดก่อน จากนั้นเนื้อหาที่ตามมาจะถูกดำเนินการเหมือนสคริปต์เชลล์
 
 พูดง่ายๆ คือ `stack.sh` เมื่อเริ่มต้นจะ "อ่าน" ไฟล์ `local.conf` ราวกับกำลังรันสคริปต์ เพื่อให้การกำหนดค่าของคุณมีผลตั้งแต่เริ่มต้น
 
 ## Step 4: รันคำสั่งติดตั้ง DevStack
 - ใช้ Tmux มาช่วย ในการ monitor
 ```bash
-sudo dnf install tmux
+sudo apt install tmux
 tmux new -s devstack
-
-# เปิดใช้งานรีพอสิทอรี messaging ของ Ubuntu 24.04
-sudo dnf install -y centos-release-rabbitmq-38
-# หรือลองติดตั้งโดยตรง
-sudo dnf install -y rabbitmq-server
 ```
 
 ## Step คำสั่งที่ใช้
@@ -327,13 +424,16 @@ DevStack Component Timing
 =========================
 Total runtime: 2847 seconds
 ...
-This is your host IP address: 10.20.30.11
+This is your host IP address: 10.0.0.11
 This is your host IPv6 address: ::1
-Horizon is now available at http://10.20.30.11/dashboard
-Keystone is serving at http://10.20.30.11/identity/
+Horizon is now available at http://10.0.0.10/dashboard
+Keystone is serving at http://10.0.0.10/identity/
 The default users are: admin and demo
 The password: Muict@2024
 ```
+
+- เปิด Dashboard ใน VM เพราะ IP เป็น ip ใน vm
+![](./images/lab01-20.png)
 
 ## กรณีที่รันซ้ำได้ปลอดภัย
 
@@ -382,32 +482,143 @@ cd /opt/stack/devstack
 !!! info "ข้อควรระวังเรื่อง IP Address"
     หากเครื่องคอมพิวเตอร์ของคุณเชื่อมต่อผ่าน DHCP และได้รับ IP Address ใหม่ (ซึ่งจะทำให้ค่า HOST_IP ที่เคยตั้งไว้ใน local.conf ไม่ตรงกับ IP ปัจจุบัน) การรัน ./stack.sh อาจเกิดข้อผิดพลาดได้ แนะนำให้ตรวจสอบ IP ของเครื่องด้วยคำสั่ง ip a ก่อนทุกครั้งว่ายังคงตรงกับค่า HOST_IP ที่ตั้งไว้หรือไม่
 
-## Step 5: ตรวจสอบการติดตั้ง
+## การใช้งาน DevStack ผ่าน Commandline
 
-### โหลด Credentials
+### SSH to Virtual Machine ด้วย Windows Terminal
+- login ไปยัง ip ของ eth0 (defautl network)
+
+
+### การ login หมายถีงอะไร
+- โดยการค่า ตัวแปรที่อยู่ใน file openrc โหลด ไปยัง ยัง Shell variable และ เมื่อ สั่ง คำสั่ง `openstack`  
+- คำสั่ง openstack เป็นคำสั่ง ที่ใช้ในการบริหารจัดการ openstack
 
 ```bash
 cd /opt/stack/devstack
-source openrc admin 
+source openrc admin admin
 ```
+- ลอง ใช้ คำสั่ง cat /opt/stack/devstack  เพื่อ ดูว่า openrc ประกอบด้วยอะไรบ้าง
+
+![](./images/lab01-27.png)
+
+### ลองมาดูว่า โหลด ค่าอะไรไปใน Shell environment บ้าง
+
+![](./images/lab01-28.png)
+
+ทั้งสองคำสั่งนี้เป็นหัวใจสำคัญในการจัดการ Environment Variables (ตัวแปรระบบ) ใน Linux โดยเฉพาะเมื่อคุณต้องทำงานกับระบบใหญ่ๆ อย่าง OpenStack ครับ
+
+เพื่อให้เห็นภาพง่ายที่สุด: **`source` คือการ "ดึงเข้ามา" ส่วน `export` คือการ "ส่งออกไป"**
+
+---
+
+### 1. คำสั่ง `export` (ส่งตัวแปรให้โปรแกรมอื่นรู้จัก)
+
+เมื่อคุณประกาศตัวแปรใน Linux ปกติ (เช่น `NAME="DevStack"`) ตัวแปรนั้นจะเป็นแค่ **Local Variable** ซึ่งรู้จักแค่ใน Shell บรรทัดคำสั่งปัจจุบันเท่านั้น หากคุณเรียกใช้โปรแกรมอื่น (เช่น รันคำสั่ง `openstack`) โปรแกรมเหล่านั้นจะมองไม่เห็นตัวแปร `NAME`
+
+คำสั่ง `export` จะเป็นการเลื่อนขั้นตัวแปรนั้นให้เป็น **Environment Variable (Global)** ทำให้ทุกโปรแกรมหรือสคริปต์ (Child Process) ที่ถูกรันต่อจากนี้ มองเห็นตัวแปรนั้นด้วย
+
+**ตัวอย่างใน OpenStack:**
+
+```bash
+export OS_USERNAME="admin"
+export OS_PASSWORD="secretpassword"
+
+```
+
+เมื่อใช้ `export` โปรแกรม `openstack` CLI ที่เขียนด้วย Python จะสามารถดึงค่า Username และ Password ไปใช้ติดต่อกับ API ได้โดยที่คุณไม่ต้องพิมพ์รหัสผ่านใหม่ทุกครั้ง
+
+---
+
+### 2. คำสั่ง `source` (รันสคริปต์ในหน้าต่างปัจจุบัน)
+
+ปกติเวลาคุณสั่งรันไฟล์สคริปต์ (เช่น `./myscript.sh`) Linux จะแอบสร้างหน้าต่างย่อย (Subshell) ขึ้นมารันคำสั่ง พอรันเสร็จ หน้าต่างย่อยนั้นก็จะปิดตัวลง ส่งผลให้ **ตัวแปรต่างๆ ที่ถูกตั้งค่าไว้ในสคริปต์นั้น หายวับไปหมด** ไม่ส่งผลถึงหน้าต่างหลักที่คุณกำลังพิมพ์อยู่
+
+คำสั่ง `source` (หรือใช้เครื่องหมายจุด `.` แทนก็ได้) จะเป็นการบังคับให้ Linux อ่านไฟล์และ **รันคำสั่งทั้งหมดในหน้าต่าง Shell ปัจจุบัน (Current Shell)**
+
+---
+
+### 3. ทำไมถึงต้องใช้คู่กัน? (ความลับของไฟล์ openrc)
+
+หากคุณลอง `cat openrc` ดูข้างใน คุณจะพบว่ามันเต็มไปด้วยคำสั่ง `export` เช่น:
+
+```bash
+# ตัวอย่างเนื้อหาในไฟล์ openrc
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=secret
+
+```
+
+![](./images/lab01-29.png)
+
+**เกิดอะไรขึ้นถ้าคุณสั่งแค่ `./openrc admin` ?**  
+!!! info
+    สังเกตุดูให้ดีครับ source openrc เชียนย่อได้เป็น  ./openrc
+
+1. Linux สร้าง Subshell ขึ้นมา
+2. รันคำสั่ง `export` ทั้งหมดข้างต้น
+3. ปิด Subshell... ค่า `OS_USERNAME` ทั้งหมดหายไป!
+4. เมื่อคุณพิมพ์คำสั่ง `openstack server list` ระบบจะฟ้องว่า *Missing Authentication* (คุณยังไม่ได้ล็อกอิน)
+
+**เหตุผลที่ต้องใช้ `source openrc admin**`
+การใช้ `source` จะเป็นการเทคำสั่ง `export` ทุกบรรทัดในไฟล์นั้น ลงในหน้าต่าง Terminal ปัจจุบันของคุณ ทำให้ตัวแปรระบบทั้งหมดถูกฝังไว้ใน Session ของคุณทันที
+
+*Verification:* หลังจากรันคำสั่ง `source` แล้ว คุณสามารถตรวจสอบได้ว่าตัวแปรถูกโหลดเข้ามาในระบบจริงๆ โดยการพิมพ์คำสั่ง `env | grep OS_` ซึ่งจะแสดงรายการตัวแปรของ OpenStack ทั้งหมดที่พร้อมใช้งานครับ
 
 ### ตรวจสอบบริการต่าง ๆ
 
 - Python API & SDK (วิธีที่นักพัฒนาเรียกใช้งาน OpenStack) ในการเขียนโปรแกรมคุยกับ OpenStack หรือแกะโค้ดส่วนที่เป็น Client SDK นักพัฒนาจะใช้เครื่องมือหลัก python-openstackclient  (Openstack CLI)  ทำให้สามารถใช้ คำสั่ง openstack ต่างๆ ได้
 
+!!! info  
+    เราสามารถติดตั้ง python-openstackclient ด้วย manual ดังนี้  
+    pip install python-openstackclient
+
+### ก่อนส่งคำสั่ง
+
+![](./images/mermaid-diagram-guest-low.png)
+
+
+```bash
+# รายการ project
+openstack project list
+```
+![](./images/lab01-32.png)
+
+```
+# run ด้วย คำสั่ง debug  
+openstack project list --debug
+```
+![](./images/lab01-32-1.png)
+
+![](./images/lab01-32-2.png)
+
+![](./images/lab01-32-3.png)
+
 ```bash
 # รายการบริการ Compute
 openstack compute service list
+```
+![](./images/lab01-30.png)
 
+```
 # รายการ Network Agent
 openstack network agent list
+```
+![](./images/lab01-31.png)
 
+```
 # รายการ VM (ควรว่าง)
 openstack server list
+```
 
+
+```
 # รายการรูปแบบ (Flavors)
 openstack flavor list
+```
 
+```
 # รายการรูป VM (Images)
 openstack image list
 ```

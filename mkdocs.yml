@@ -79,6 +79,7 @@ nav:
   - การบรรยาย:
     - lectures/lecture01-introduction.md
     - lectures/lecture02-architecture.md
+    - lectures/lecture01-software-arch.md
     - lectures/lecture03-keystone.md
     - lectures/lecture04-nova.md
     - lectures/lecture05-neutron.md
