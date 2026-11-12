@@ -74,9 +74,13 @@ Start-VM -Name "DevStackUbuntu2404"
 
 ![](./images/lab01-2-3.png)
 
+
+- ตรวจสอบ  network card ของ ubuntu ว่า ออก หรือไม่
+![](./images/lab01-2-4.png)
+
 !!! tip  "SSH จาก Windows"
     สามารถเข้าใช้ โดยการ ssh จาก Window terminal จะสะดวก ง่ายกว่าในการ Copy-Paste.
-    ให้เข้าใช้งาน ไปที่ Linux Terminal สามารถ เปิด ผ่าน GUI แต่แนะนำ ให้เข้าผ่าน Window Termial ssh เข้าไป  ip 172.24.90.3  (ip eth0 คามรูปด้านบน แต่เครื่องแต่ละเครื่องจะต่างกัน)
+    ให้เข้าใช้งาน ไปที่ Ubuntu Server สามารถ เปิด ผ่าน GUI แต่แนะนำ ให้เข้าผ่าน Window Termial ssh เข้าไป  ip 172.24.90.3  (ip eth0 คามรูปด้านบน แต่เครื่องแต่ละเครื่องจะต่างกัน)
 
 
 ### 2 สร้าง stack user

@@ -87,8 +87,6 @@ nav:
     - lectures/lecture08-swift.md
     - lectures/lecture09-heat.md
     - lectures/lecture10-ceilometer.md
-    - lectures/lecture11-kolla-ansible.md
-    - lectures/lecture12-troubleshooting.md
   - การทดลอง:
     - labs/lab00-centos-hyperv.md
     - labs/lab01-devstack-centos.md
