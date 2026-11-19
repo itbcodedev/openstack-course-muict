@@ -60,6 +60,9 @@ title: "การทดลองที่ 2: Horizon Dashboard และกา�
 
 ![](./images/horizon_lab4.png)
 ![](./images/horizon_lab5.png)
+
+
+
 ### สร้าง User
 
 - 1 ไปที่ **Identity → Users → Create User**
@@ -195,6 +198,15 @@ openstack port list
 - 7 Key Pair: สร้างหรือนำเข้า
 - 8 คลิก **Launch Instance**
 
+### ตรวจสอบ
+```bash
+openstack image list
+openstack flavor list
+```
+![](./images/compute_lab21.png)
+
+
+
 ![](./images/compute_lab1.png)
 ![](./images/compute_lab2.png)
 - กดลูกศรชึ้นเป็นการเลือก image มาใช้งานม เลือก Create new Volume จะไปขอ Disk จาก Cinder มาใช้ แบบถาวร แต่ต้องระบุ ขนาด Disk ในที่นี้เลือก 1GB เพราะเป็น Cirros
@@ -267,6 +279,23 @@ openstack port list
 ![](./images/floating_lab4.png)
 - ดู ผลที่ได้ Project > Network > Floating IPS เมนู
 ![](./images/floating_lab5.png)
+
+- การตรวจสอบ 
+```
+openstack server list          # ยืนยันว่า cli-vm-01 อยู่ในสถานะ ACTIVE
+openstack floating ip list     # ยืนยันการผูก
+openstack volume list          # ยืนยันการเชื่อมต่อวอลุ่ม
+```
+![](./images/floating_lab6.png)
+
+
+
+
+## End of Week 2 here
+
+
+
+
 
 !!! success ":white_check_mark: ทดสอบการเชื่อมต่อ"
     จากเครื่อง Host (Windows):

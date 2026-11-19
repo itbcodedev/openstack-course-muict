@@ -10,15 +10,37 @@ title: "การบรรยายที่ 3: Keystone — ระบบจั�
 - จัดการ Users, Projects, Roles และ Domains
 - ทำงานกับ Service Catalog และ Endpoints
 
+![](./images/keystone3.png)
 ---
 
 ## Keystone คืออะไร?
 
-Keystone คือ **บริการ Identity** ของ OpenStack ให้บริการ:
+**Keystone (OpenStack Identity Service)** คือบริการศูนย์กลางสำหรับจัดการ **การยืนยันตัวตน (Authentication)**, **การกำหนดสิทธิ์ (Authorization)** และ **ทำเนียบบริการ (Service Catalog)** ของระบบ OpenStack ทั้งหมด
 
-- **Authentication** — ยืนยันว่าคุณเป็นใคร
-- **Authorization** — ตรวจสอบว่าคุณทำอะไรได้บ้าง
-- **Service Catalog** — แสดงรายการบริการที่มีพร้อม Endpoints
+### หน้าที่หลักของ Keystone
+
+* **Authentication (ยืนยันตัวตน):** ตรวจสอบว่าผู้ใช้ (User) เป็นใคร ผ่าน Username/Password หรือ API Key แล้วออก **Token** ให้เพื่อนำไปใช้ติดต่อกับ Service อื่นๆ (เช่น Nova, Neutron, Cinder) โดยไม่ต้องส่งรหัสผ่านซ้ำ
+* **Authorization (กำหนดสิทธิ์):** ควบคุมว่า User คนนั้นมีสิทธิ์ทำอะไรได้บ้าง (Role-Based Access Control - RBAC) ในขอบเขต (Project) ไหน
+* **Service Catalog (ทำเนียบบริการ):** เก็บรายชื่อและ URL (Endpoints) ของ Service ทั้งหมดในระบบ OpenStack เพื่อให้ Service ต่างๆ ค้นหาและคุยกันได้
+
+---
+
+### โครงสร้างพื้นฐาน (Core Concepts)
+
+* **User:** บัญชีผู้ใช้งาน (คน หรือ ระบบ)
+* **Project (หรือ Tenant):** กลุ่มของทรัพยากร (เช่น VM, Network) ที่แยกออกจากกันตามทีมหรือแผนก
+* **Role:** บทบาทหน้าที่ที่กำหนดสิทธิ์การใช้งาน เช่น `admin`, `member`, `reader`
+* **Domain:** ขอบเขตระดับบนสุดที่ครอบ User และ Project อีกที (เช่น แยกตามบริษัทหรือองค์กร)
+* **Token:** กุญแจชั่วคราวที่ Keystone ออกให้หลัง Login สำเร็จ เพื่อใช้ยืนยันสิทธิ์ในการเรียก API ของ OpenStack Service อื่นๆ
+
+
+![](./images/keystone1.png)
+
+![](./images/keystone2.png)
+
+- ต่อท้าย คำสั่ง ด้วย `-debug`
+![](./images/keystone4.jpg)
+
 
 ---
 
@@ -82,6 +104,38 @@ Token ที่มี Project Scope ใช้ในบริบทของ Proj
 | **UUID** | String สุ่ม ตรวจสอบโดย Keystone ทุกครั้ง |
 | **PKI/PKIz** | Self-validating ลายเซ็น Cryptographic |
 | **Fernet** | Default ใน OpenStack สมัยใหม่ มี Payload ที่เข้ารหัส |
+
+**Fernet Token** คือรูปแบบของ Token มาตรฐานใน OpenStack Keystone ที่ใช้การเข้ารหัสแบบสมมาตร (Symmetric Encryption) เพื่อเก็บข้อมูลการยืนยันตัวตนไว้ในตัว Token เองโดยตรง ทำให้ **Keystone ไม่ต้องบันทึกลงฐานข้อมูล (Stateless)**
+
+---
+
+### หลักการทำงานของ Fernet Token
+
+1. **การเข้ารหัส (Encryption):** เมื่อ User ล็อกอินผ่าน Keystone ระบบจะนำข้อมูลที่จำเป็น (เช่น User ID, Project ID, เวลาหมดอายุ) มาเข้ารหัสและลงลายมือชื่อดิจิทัล (HMAC-SHA256) ด้วยกุญแจลับ (Fernet Keys) ที่เก็บอยู่ในเครื่อง Server
+2. **ขนาดกะทัดรัด:** ข้อมูลที่ถูกเข้ารหัสจะถูกแปลงเป็นข้อความสั้นๆ (ความยาวไม่เกิน 255 ตัวอักษร) ส่งกลับไปให้ Client ใน Header `X-Subject-Token`
+3. **การตรวจสอบ (Validation):** เมื่อ Client นำ Token ไปเรียกใช้ Service อื่น (เช่น Nova) Service นั้นจะส่ง Token กลับมาให้ Keystone ตรวจสอบ Keystone เพียงแค่ใช้ Fernet Key ถอดรหัสและเช็กเวลาหมดอายุ โดยไม่ต้องวิ่งไป Query ฐานข้อมูลให้เสียเวลา
+
+---
+
+### ข้อดีของ Fernet Token (เทียบกับแบบเก่าเช่น UUID หรือ PKI)
+
+![](./images/fernet.jpg)
+
+* **ไม่ต้องพึ่งพา Database (No DB Overhead):** ลดภาระของ Database อย่างมหาศาล ไม่ต้องคอยลบ Token ที่หมดอายุออกจากตาราง (แก้ปัญหา Database บวมในระบบใหญ่)
+* **ขนาดเล็ก ส่งผ่าน HTTP Header ได้สบาย:** ต่างจาก PKI Token ในอดีตที่มีขนาดใหญ่มากจนบางครั้งเกินขีดจำกัดของ Web Server
+* **ความปลอดภัยสูงและหมุนเวียนกุญแจได้ (Key Rotation):** รองรับการเปลี่ยนกุญแจเข้ารหัสตามรอบเวลา โดยที่ Token เก่าที่ยังไม่หมดอายุยังสามารถใช้งานต่อไปได้จนกว่าจะครบกำหนด
+
+---
+
+### การจัดการ Fernet Keys (จุดสำคัญสำหรับผู้ดูแลระบบ)
+
+การสร้างและจัดการกุญแจจะใช้คำสั่ง `keystone-manage` โดยมีสถานะของไฟล์กุญแจ (เก็บอยู่ที่ `/etc/keystone/fernet-keys/`) แบ่งเป็น 3 ประเภทตามชื่อไฟล์ที่เป็นตัวเลข:
+
+* **Primary Key (เลขสูงสุด เช่น `2`):** ใช้สำหรับ **เข้ารหัส (สร้าง)** Token ใหม่ และ **ถอดรหัส** Token ที่สร้างจากกุญแจนี้
+* **Secondary Keys (เลขรองลงมา เช่น `1`):** ใช้สำหรับ **ถอดรหัส (ตรวจสอบ)** Token เก่าที่ถูกสร้างไว้ก่อนจะมีการเปลี่ยนกุญแจเท่านั้น
+* **Staged Key (ไฟล์ชื่อ `0` เสมอ):** กุญแจที่เตรียมพร้อมไว้ล่วงหน้า เมื่อถึงรอบการหมุนเวียนกุญแจ (Key Rotation) ไฟล์ `0` จะถูกเลื่อนขั้นเป็น Primary Key ตัวใหม่
+
+
 
 ---
 
