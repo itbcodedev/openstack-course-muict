@@ -45,7 +45,7 @@ DevStack แบบเครื่องเดียวเหมาะกับ�
 ### สิ่งที่ผู้สอนเตรียม
 
 - เปิด Swift และเตรียม Swift CLI (`python-swiftclient`) พร้อม Credentials ของ Project ทดสอบ ตรวจว่า `openstack catalog list` มีบริการประเภท `object-store` และ `swift stat` สำเร็จด้วยบัญชีผู้เรียน
-- หากไม่มี Endpoint ให้ตรวจว่า DevStack เปิด Swift ตาม [Lab 1](../labs/lab01-devstack.md) และคู่มือ DevStack หาก Endpoint มีแต่เข้าไม่ได้ ให้ตรวจ Project, สิทธิ์ และการเข้าถึง Proxy ก่อนเริ่ม Workshop
+- หากไม่มี Endpoint ให้ตรวจว่า DevStack เปิด Swift ตาม [Lab 1](../labs/lab01-devstack-ubuntu.md) และคู่มือ DevStack หาก Endpoint มีแต่เข้าไม่ได้ ให้ตรวจ Project, สิทธิ์ และการเข้าถึง Proxy ก่อนเริ่ม Workshop
 
 ### ขั้นที่ 1 — สร้าง Container และอัปโหลด (15–20 นาที)
 

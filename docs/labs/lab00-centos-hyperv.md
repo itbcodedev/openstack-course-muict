@@ -433,7 +433,7 @@ Hyper-V Manager → เลือก VM → Checkpoint → ตั้งชื่�
 
 ## ตรวจสอบก่อนไป Lab ถัดไป
 
-ก่อนดำเนินการ [Lab 1: ติดตั้ง DevStack](lab01-devstack.md) ให้ตรวจสอบรายการนี้:
+ก่อนดำเนินการ [Lab 1: ติดตั้ง DevStack Centos](lab01-devstack-centos.md) ให้ตรวจสอบรายการนี้:
 
 - [ ] CentOS Stream 9 ติดตั้งเสร็จสมบูรณ์
 - [ ] ทั้ง 3 network interfaces ตอบสนอง (ใช้ `ip addr` ตรวจสอบ)

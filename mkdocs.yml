@@ -83,6 +83,7 @@ nav:
     - lectures/lecture03-keystone.md
     - lectures/lecture04-nova.md
     - lectures/lecture05-neutron.md
+    - lectures/lecture05-ovs.md
     - lectures/lecture06-glance.md
     - lectures/lecture07-cinder.md
     - lectures/lecture08-swift.md
@@ -94,6 +95,7 @@ nav:
     - labs/lab01-devstack-ubuntu.md
     - labs/lab01-import-devstack.md
     - labs/lab02-horizon.md
+    - labs/lab04-glance.md
     - labs/lab03-cli.md
     - labs/week1-workshop.md
   - แหล่งข้อมูล: resources.md

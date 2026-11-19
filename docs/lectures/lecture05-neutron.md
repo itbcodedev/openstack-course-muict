@@ -12,6 +12,26 @@ title: "การบรรยายที่ 5: Neutron — บริการ�
 
 ## Neutron ทำอะไร?
 
+![](./images/neutron1.png)
+
+**OpenStack Neutron** คือบริการจัดการระบบเครือข่ายเสมือน (**Networking-as-a-Service**) ของ OpenStack ทำหน้าที่เชื่อมต่อระหว่าง Instance (VM) กับระบบเครือข่ายภายนอก
+
+### 1. องค์ประกอบหลัก (Core Components)
+
+* **Network:** เครือข่ายเสมือนเทียบเท่ากับ Physical Switch (แยกได้เป็น *Provider Network* ที่ต่อออกภายนอกตรง กับ *Self-service/Tenant Network* ที่ผู้ใช้สร้างแยกกันเอง)
+* **Subnet:** วงเครือข่ายสำหรับแจกจ่าย IP Address, Subnet Mask, Gateway และ DNS (มีบริการ DHCP ในตัว)
+* **Port:** จุดเชื่อมต่อเสมือนที่เชื่อมการ์ดแลน (vNIC) ของ VM เข้ากับ Network พร้อมกำหนด IP และ MAC Address
+* **Router:** ตัวกลางเชื่อมต่อข้าม Subnet และทำหน้าที่ **NAT** (SNAT/DNAT) เพื่อเชื่อมวงภายในออกสู่อินเทอร์เน็ต
+
+### 2. ฟีเจอร์สำคัญ (Key Features)
+
+* **Floating IP:** การผูก Public IP เข้ากับ Private IP ของ VM เพื่อให้เข้าถึงจากภายนอกได้
+* **Security Groups:** Firewall เสมือนระดับ Port (Stateful) ใช้ควบคุม Traffic เข้า-ออก (Ingress/Egress) ของ VM
+* **Network Isolation:** แยกเครือข่ายของแต่ละ Project ออกจากกันอย่างอิสระด้วยเทคโนโลยี Overlay เช่น **VXLAN**, **GRE** หรือ **VLAN** (ผ่านกลไก ML2 Plugin และ OVN / Open vSwitch)
+
+> **สรุปสั้นๆ:** Neutron เปรียบเสมือน **"ผู้ดูแลระบบเครือข่ายเสมือน"** ที่คอยสร้าง Switch, Router, แจก IP และตั้งค่า Firewall ให้กับ VM ทุกตัวใน OpenStack ครับ
+
+
 ใน [Lecture 04](lecture04-nova.md) เราใช้ Nova สร้าง VM เมื่อเลือก Network ตอนกด Launch ระบบใช้ **Neutron** จัดการจุดเชื่อมต่อของ VM จัดสรร IP จาก Subnet ที่กำหนด และบังคับใช้กฎเครือข่ายที่ผูกกับพอร์ตนั้น
 
 | คำศัพท์ | หน้าที่ | ตัวอย่างใน Lab |
@@ -33,6 +53,20 @@ title: "การบรรยายที่ 5: Neutron — บริการ�
 
 External Network ของ DevStack อาจอยู่บน `br-ex` ที่เข้าถึงได้จากบางเครื่องเท่านั้น คำว่า External ใน Horizon จึงบอกบทบาทของเครือข่ายใน OpenStack ส่วนการเข้าถึงจาก Windows host หรืออินเทอร์เน็ตขึ้นกับการเชื่อมต่อและเส้นทางจริงของ Lab
 
+![](./images/neutron2.png)
+
+### คำสั่ง ที่ใช้สำหรับ การเรียนรู้เรื่อง neutron
+- `sudo ovs-vsctl show`  ใช้ดูว่า br-ex เชื่อมกับ interface ชื่อ อะไร 
+- `sudo ovs-vsctl list-ports br-ex` ใช้ ดูแบบ จำเพาะเจาะจง
+![](./images/neutron3.png)
+- จุดสังเกต: ใต้ Bridge br-ex ต้องมี Port "eth2"
+
+!!! note "ovs-vsctl"
+    ovs-vsctl (ย่อมาจาก Open vSwitch Control) คือคำสั่งหลักสำหรับ ตั้งค่าและจัดการโครงสร้างของ Open vSwitch (OVS) ผ่านการสื่อสารกับฐานข้อมูล ovsdb-server ครับ (หมายเหตุ: ตัวสะกดที่ถูกต้องคือ ovs-vsctl ไม่มี vs ซ้ำครับ)
+
+[(เสริม) Open vSwitch : Network As Service  ใน Openstack](./lecture05-ovs.md)
+![](./images/ovs-page.png)
+
 ### Provider Network และ Self-Service Network
 
 - **Provider Network** เชื่อมกับโครงสร้างเครือข่ายที่ผู้ดูแลกำหนด เช่น **Flat** ที่ไม่มี VLAN Tag บน segment นั้น หรือ **VLAN** ที่ใช้ Tag แบ่ง segment
@@ -41,7 +75,7 @@ External Network ของ DevStack อาจอยู่บน `br-ex` ที�
 
 ## Neutron เบื้องหลังใน Hibiscus (2026.2)
 
-ตัวอย่างนี้อิง **ML2/OVN** ที่อธิบายไว้ใน [Lab 1 — DevStack](../labs/lab01-devstack.md) ผู้สอนควรตรวจ Backend ของเครื่องจริงก่อนสาธิต เพราะ Release เดียวกันเลือก Backend ได้ตามการติดตั้ง
+ตัวอย่างนี้อิง **ML2/OVN** ที่อธิบายไว้ใน [Lab 1 — DevStack](../labs/lab01-devstack-ubuntu.md) ผู้สอนควรตรวจ Backend ของเครื่องจริงก่อนสาธิต เพราะ Release เดียวกันเลือก Backend ได้ตามการติดตั้ง
 
 1. **Neutron API และ ML2** รับคำขอสร้าง Network, Subnet หรือ Port โดย Type Driver ดูแลชนิดของ network segment และ Mechanism Driver นำการตั้งค่าไปใช้กับ Backend
 2. **ML2/OVN** ส่งการตั้งค่าเชิงตรรกะไปยัง OVN Northbound DB จากนั้น `ovn-northd` แปลงเป็นข้อมูลที่ใช้ควบคุมเครือข่ายใน Southbound DB

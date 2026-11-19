@@ -10,7 +10,13 @@ title: "การบรรยายที่ 6: Glance — บริการ Im
 - อ่านรูปแบบไฟล์ สถานะ และ Visibility ของ Image จาก Glance
 - อัปโหลด Image แบบ Private บน DevStack Hibiscus (2026.2) แล้วพิสูจน์ว่า VM บูตจาก Image นั้นได้
 
+
+![](../labs/images/glance-lab2.jpg)
+
 ## Glance ทำอะไร?
+
+บริการ OpenStack Glance (Image Service) มีการจำแนกรูปแบบไฟล์ออกเป็น 2 ประเภทหลักเมื่อทำการอัปโหลด Image ได้แก่ Disk Formats (รูปแบบดิสก์เสมือน) และ Container Formats (รูปแบบตู้คอนเทนเนอร์/เมทาดาตา)เพื่อบอกให้ระบบทราบว่าไฟล์ที่อัปโหลดมานั้นมีโครงสร้างดิสก์แบบใดและบรรจุข้อมูลมาอย่างไร
+
 
 ใน [Lecture 04](lecture04-nova.md) เราเลือก Image ตอนกด Launch Instance บทนี้จะตามไปดูว่า **ไฟล์ที่ใช้บูตมาจากไหน** และเราจะรู้ได้อย่างไรว่า VM ใช้ Image ที่ตั้งใจเลือก
 

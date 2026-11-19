@@ -48,7 +48,7 @@ title: "การบรรยายที่ 9: Heat — บริการ Orch
 ### สิ่งที่ผู้สอนเตรียม
 
 - ตรวจว่า Project ของนักศึกษาใช้ Heat ได้ โดย `openstack catalog list` แสดงบริการประเภท `orchestration` และ `openstack stack list` สำเร็จ
-- หาก CLI ไม่รู้จักคำสั่ง `stack` ให้ตรวจปลั๊กอิน `python-heatclient` ใน Python Environment เดียวกับ OpenStack CLI หากไม่มีบริการ `orchestration` ให้ตรวจการเปิด Heat ตาม [Lab 1](../labs/lab01-devstack.md) และคู่มือ Heat สำหรับ DevStack
+- หาก CLI ไม่รู้จักคำสั่ง `stack` ให้ตรวจปลั๊กอิน `python-heatclient` ใน Python Environment เดียวกับ OpenStack CLI หากไม่มีบริการ `orchestration` ให้ตรวจการเปิด Heat ตาม [Lab 1](../labs/lab01-devstack-ubuntu.md) และคู่มือ Heat สำหรับ DevStack
 - เตรียม Image ที่บูตได้, Flavor ที่อยู่ในโควตา และ Network ที่มี IPv4 Subnet พร้อม IP ว่างสำหรับสร้าง Port ให้ผู้เรียนใช้ Project เดียวกันใน CLI และ Horizon
 
 ### ขั้นที่ 1 — เตรียม Template และพารามิเตอร์ (10–15 นาที)

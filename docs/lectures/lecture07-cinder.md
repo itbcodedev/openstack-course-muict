@@ -10,7 +10,52 @@ title: "การบรรยายที่ 7: Cinder — บริการ Bl
 - อธิบายว่า Cinder และ Nova ทำงานร่วมกันอย่างไรเมื่อ Attach Volume
 - ย้าย Volume ระหว่าง VM สองเครื่องและตรวจสอบว่าข้อมูลยังอยู่
 
+![](./images/cinder1.jpg)
+
 ## Cinder ทำอะไร?
+
+**OpenStack Cinder** คือบริการจัดการพื้นที่จัดเก็บข้อมูลแบบ **Block Storage-as-a-Service** ทำหน้าที่สร้างและจัดการฮาร์ดดิสก์เสมือนถาวร (**Persistent Volumes**) เพื่อนำไปเสียบใช้งานกับ Instance (VM) เสมือนการนำฮาร์ดดิสก์หรือ External Hard Drive ไปต่อเพิ่มให้กับเครื่องคอมพิวเตอร์
+
+---
+
+### 1. จุดเด่นและหลักการทำงานสำคัญ
+
+* **Persistent Storage (ข้อมูลถาวร):** ข้อมูลที่เก็บใน Cinder Volume จะไม่สูญหายแม้ว่าจะปิด (Shutoff) หรือลบ (Delete) ตัว VM ทิ้งไป (ต่างจาก Ephemeral Disk ของ Nova ที่จะหายไปพร้อมกับ VM)
+* **Attach / Detach ได้อิสระ:** สามารถถอด Volume ออกจาก VM เครื่องหนึ่ง แล้วนำไปเสียบเข้ากับ VM อีกเครื่องหนึ่งได้ทันที เพื่อย้ายข้อมูลหรือกู้คืนระบบ
+* **Boot from Volume:** สามารถนำไฟล์ Image จาก Glance มาลงใน Cinder Volume แล้วสั่งให้ VM บูตจาก Volume นี้โดยตรงได้ (เหมือนที่คุณตั้งค่า `Create New Volume = Yes` ในหน้า Launch Instance)
+
+
+
+---
+
+### 2. สถาปัตยกรรมและบริการย่อย (Components)
+
+* **`cinder-api`:** ด่านหน้าคอยรับคำสั่ง API จากผู้ใช้ (Dashboard / CLI) หรือจาก Nova (เช่น คำสั่งสร้าง ขยายขนาด หรือเสียบ Volume)
+* **`cinder-scheduler`:** ทำหน้าที่ตัดสินใจเลือก Storage Backend ที่เหมาะสมที่สุดในการสร้าง Volume (เช่น ดูจากพื้นที่ว่างหรือ Volume Type ที่เลือก)
+* **`cinder-volume`:** ตัวทำงานหลักที่สื่อสารกับฮาร์ดแวร์/ซอฟต์แวร์ Storage จริงผ่าน Driver ต่างๆ เช่น **LVM** (`lvmdriver-1` บน DevStack), **Ceph RBD**, **NFS**, **iSCSI** หรือ Enterprise SAN Storage
+
+
+* **`cinder-backup`:** บริการสำหรับสำรองข้อมูลของ Volume ออกไปเก็บไว้ภายนอก เช่น เก็บลง Object Storage (Swift / S3)
+
+---
+
+### 3. ฟีเจอร์หลักที่ใช้งานบ่อย
+
+* **Snapshot:** ถ่ายภาพสถานะของ Volume ณ เวลานั้นเก็บไว้ เพื่อใช้กู้คืนหรือสร้างเป็น Volume ก้อนใหม่
+* **Extend Volume:** ขยายขนาดพื้นที่ของ Volume ให้ใหญ่ขึ้นได้เมื่อพื้นที่เดิมใกล้เต็ม
+* **Volume Types:** การจัดกลุ่มระดับความเร็วหรือชนิดของ Storage (เช่น SSD vs HDD, หรือ `lvmdriver-1`) เพื่อให้ผู้ใช้เลือกตามความเหมาะสมของงาน
+
+
+
+---
+
+### เปรียบเทียบกับ Storage ตัวอื่นใน OpenStack เพื่อไม่ให้สับสน
+
+| บริการ | ประเภท Storage | ลักษณะการใช้งาน |
+| --- | --- | --- |
+| **Cinder** | **Block Storage** | ฮาร์ดดิสก์เสมือนสำหรับเสียบเข้า VM (เก็บ OS, Database) |
+| **Swift** | **Object Storage** | พื้นที่เก็บไฟล์ผ่าน API (เก็บไฟล์ Backup, รูปภาพ, วิดีโอ คล้าย Amazon S3) |
+| **Glance** | **Image Service** | คลังเก็บไฟล์ต้นแบบระบบปฏิบัติการ (OS Image เช่น `.qcow2`, `.iso`) |
 
 ใน [Lecture 06](lecture06-glance.md) เราใช้ Image เป็นต้นแบบบูต VM ถ้าต้องการแยกข้อมูลของแอปออกจากดิสก์ระบบ ให้สร้าง **Data Volume** ด้วย Cinder แล้ว Attach เข้า VM ระบบปฏิบัติการจะเห็นเป็นอุปกรณ์แบบ Block Device และสามารถสร้าง Filesystem หรือใช้เป็นดิสก์ให้แอปได้
 

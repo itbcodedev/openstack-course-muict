@@ -19,8 +19,12 @@ title: "การทดลองที่ 1: ติดตั้ง DevStack บ�
 | ผู้ใช้ | `stack` (non-root พร้อม sudo NOPASSWD) |
 | เครือข่าย | 3 adapters ตามที่ตั้งค่าใน Lab 0 |
 
+!!! info
+    การเรียนรู้การใช้งาน Openstack เป็นการติดตั้ง  Ubuntu 24.04 นักศึกษาสามารถ อ่านวิธีการ ขั้นตอนการ import file image ได้จาก เอกสาร [ วิธีการ import ](./lab01-import-devstack.md)
 ---
-## install Opentack ด้วย Devstack
+
+
+## ขั้นตอนการติดตั้ง Opentack ด้วย วิธีการ Devstack บน Ubuntu 24.04
 -Souce code [https://github.com/openstack/devstack](https://github.com/openstack/devstack)
 
 ![](./images/lab01-26.png)

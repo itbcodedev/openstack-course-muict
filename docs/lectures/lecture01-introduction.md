@@ -33,6 +33,8 @@ Cloud Computing คือการส่งมอบทรัพยากรไ�
 
 ---
 
+![](./images/os_logo_small.png)
+
 ## ภาพรวม OpenStack
 
 !!! quote "พันธกิจของ OpenStack"
